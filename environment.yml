@@ -1,0 +1,15 @@
+name: llm-agent-chem
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - rdkit
+  - pandas
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - tqdm
+  - pip
+  - pip:
+      - openai
+      - joblib

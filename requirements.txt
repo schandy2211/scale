@@ -1,0 +1,8 @@
+rdkit-pypi
+scikit-learn
+pandas
+numpy
+matplotlib
+tqdm
+openai
+joblib

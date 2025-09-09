@@ -1,0 +1,16 @@
+smiles,property
+CC,0.10
+CCC,0.20
+CCO,0.50
+CCN,0.40
+CO,0.48
+CNC,0.28
+OCCO,0.60
+CC(=O)O,0.55
+CCOC,0.45
+CCCN,0.25
+c1ccccc1,0.30
+c1ccncc1,0.35
+C1CCCCC1,0.22
+CCCl,0.15
+CCBr,0.12
