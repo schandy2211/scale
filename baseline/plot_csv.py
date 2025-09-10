@@ -76,8 +76,33 @@ def plot_qed_sa_scatter(round_rows: List[dict], out_path: str) -> None:
         xs.append(q)
         ys.append(s)
         cs.append(r["round"])
+    
+    # If no SA scores available, create a QED distribution plot instead
     if not xs:
+        qed_values = []
+        rounds = []
+        for r in round_rows:
+            q = r["qed"]
+            if q is not None:
+                qed_values.append(q)
+                rounds.append(r["round"])
+        
+        if not qed_values:
+            return
+            
+        plt.figure(figsize=(6, 4))
+        sc = plt.scatter(rounds, qed_values, c=rounds, cmap="viridis", s=12, alpha=0.7)
+        cbar = plt.colorbar(sc)
+        cbar.set_label("Round")
+        plt.xlabel("Round")
+        plt.ylabel("QED")
+        plt.title("QED Distribution by Round (SA scores not available)")
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(out_path, dpi=150)
+        plt.close()
         return
+    
     plt.figure(figsize=(6, 4))
     sc = plt.scatter(xs, ys, c=cs, cmap="viridis", s=12, alpha=0.7)
     cbar = plt.colorbar(sc)

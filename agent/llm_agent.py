@@ -4,9 +4,13 @@ LLM-based agent for molecular modification using OpenAI API.
 
 import os
 import json
+import warnings
 from typing import List, Tuple, Optional
 from rdkit import Chem
 import openai
+
+# Suppress RDKit deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="rdkit")
 
 from .chemical_constraints import ChemicalConstraints
 
