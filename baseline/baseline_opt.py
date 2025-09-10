@@ -8,7 +8,15 @@ from dataclasses import dataclass
 from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 # Suppress RDKit deprecation warnings
+os.environ['RDKIT_VERBOSE'] = '0'
 warnings.filterwarnings("ignore", message=".*GetValence.*", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=".*please use GetValence.*", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="rdkit")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Also suppress at the logging level
+import logging
+logging.getLogger('rdkit').setLevel(logging.ERROR)
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, BRICS, rdMolDescriptors, Descriptors, Lipinski, QED

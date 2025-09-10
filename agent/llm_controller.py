@@ -4,9 +4,13 @@ LLM-based controller for molecular optimization decisions.
 
 import json
 import os
+import warnings
 from dataclasses import dataclass
 from typing import Dict, Optional
 import openai
+
+# Suppress RDKit deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="rdkit")
 
 from .controller import Observation, Action
 
@@ -51,15 +55,21 @@ class LLMController:
                 messages=[
                     {
                         "role": "system", 
-                        "content": "You are an expert in molecular optimization. You decide on optimization parameters based on the current state."
+                        "content": "You are an expert in molecular optimization. Always respond with valid JSON."
                     },
                     {"role": "user", "content": prompt}
                 ],
-                max_completion_tokens=200
+                max_completion_tokens=1000
             )
             
             # Parse LLM response
             response_text = response.choices[0].message.content.strip()
+            
+            # If empty response, use fallback immediately
+            if not response_text:
+                print("Empty LLM response, using fallback")
+                return self._fallback_decision(obs)
+                
             return self._parse_response(response_text, obs)
             
         except Exception as e:
@@ -71,30 +81,9 @@ class LLMController:
         """Create a prompt for the LLM based on the observation."""
         improved = obs.best > obs.last_best + 1e-6
         
-        prompt = f"""
-Current optimization state:
-- Round: {obs.round_index}/{obs.rounds_total}
-- Training set size: {obs.train_size}
-- Best score: {obs.best:.4f} (previous: {obs.last_best:.4f})
-- Average score: {obs.avg:.4f} (previous: {obs.last_avg:.4f})
-- Improvement: {'Yes' if improved else 'No'}
+        prompt = f"""Round {obs.round_index}/{obs.rounds_total}, Best: {obs.best:.3f}, Improved: {'Yes' if improved else 'No'}
 
-Based on this state, decide on optimization parameters. Respond with a JSON object containing:
-- op: "brics" or "attach" (molecular generation operator)
-- k: exploration weight (0.0-2.0, higher = more exploration)
-- div: diversity penalty (0.0-1.0, higher = more diversity)
-- lam: strain penalty scale (0.0-2.0, higher = more strain penalty)
-- sa_beta: synthetic accessibility penalty (0.0-1.0)
-- scaf_alpha: scaffold penalty (0.0-1.0)
-
-Guidelines:
-- If no improvement: increase exploration (k), diversity (div), reduce strain (lam)
-- If improving: keep parameters steady or slightly adjust
-- Switch operators if stagnating for multiple rounds
-- Keep values in safe ranges
-
-Respond with JSON only:
-"""
+Return JSON: {{"op": "brics", "k": 1.0, "div": 0.2, "lam": 1.0, "sa_beta": 0.0, "scaf_alpha": 0.0}}"""
         return prompt
     
     def _parse_response(self, response_text: str, obs: Observation) -> Action:
