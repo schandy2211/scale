@@ -3,8 +3,12 @@ import random
 import time
 import os
 import csv
+import warnings
 from dataclasses import dataclass
 from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+
+# Suppress RDKit deprecation warnings
+warnings.filterwarnings("ignore", message=".*GetValence.*", category=DeprecationWarning)
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, BRICS, rdMolDescriptors, Descriptors, Lipinski, QED
@@ -19,6 +23,7 @@ if _ROOT not in _sys.path:
     _sys.path.insert(0, _ROOT)
 
 from agent.controller import HeuristicController, Observation, Action
+from agent.llm_controller import LLMController
 try:
     # Preferred modern fingerprint API (avoids deprecation warnings)
     from rdkit.Chem import rdFingerprintGenerator as _rdFG  # type: ignore
@@ -658,6 +663,7 @@ class OptConfig:
     scaffold_penalty_alpha: float = 0.0 # subtract alpha * scaffold-usage (normalized)
     log_csv: Optional[str] = None       # write per-round selections to CSV if set
     use_controller: bool = False        # enable agentic controller
+    use_llm_controller: bool = False    # use LLM-based controller instead of heuristic
     scaffold_cap_per_round: Optional[int] = None  # hard cap per Murcko scaffold among selected
     # Composite objective training (align model to realism):
     # if True, train RF on eff = QED - sa_soft_beta*SA - lambda_strain*strain
@@ -817,7 +823,18 @@ def run_optimization(
             csv_writer = None
             csv_file = None
 
-    controller = HeuristicController() if cfg.use_controller else None
+    # Initialize controller (LLM or heuristic)
+    if cfg.use_controller:
+        if cfg.use_llm_controller:
+            try:
+                controller = LLMController()
+            except Exception as e:
+                print(f"Failed to initialize LLM controller: {e}. Falling back to heuristic controller.")
+                controller = HeuristicController()
+        else:
+            controller = HeuristicController()
+    else:
+        controller = None
     decisions: List[Dict[str, object]] = []
 
     for r in range(cfg.rounds):
@@ -1232,6 +1249,7 @@ if __name__ == "__main__":
     parser.add_argument("--scaf_alpha", type=float, default=0.0, help="Scaffold usage penalty alpha")
     parser.add_argument("--csv", dest="csv", default="", help="CSV path to log per-round selections")
     parser.add_argument("--agent", action="store_true", help="Enable agentic controller (heuristic)")
+    parser.add_argument("--llm", action="store_true", help="Use LLM-based controller (requires OPENAI_API_KEY)")
     parser.add_argument("--history_json", default="", help="Path to save history JSON (best/avg/n_train)")
     parser.add_argument("--decisions_json", default="", help="Path to save per-round decisions JSON")
     parser.add_argument("--top_json", default="", help="Path to save final top list JSON")
@@ -1258,7 +1276,8 @@ if __name__ == "__main__":
         sa_soft_beta=args.sa_beta,
         scaffold_penalty_alpha=args.scaf_alpha,
         log_csv=(args.csv if args.csv else None),
-        use_controller=args.agent,
+        use_controller=args.agent or args.llm,
+        use_llm_controller=args.llm,
         scaffold_cap_per_round=(None if args.scaffold_cap is None or args.scaffold_cap < 0 else args.scaffold_cap),
         audit_k=args.audit_k,
         preserve_seed_scaffold=args.preserve_scaffold,
