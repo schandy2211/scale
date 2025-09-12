@@ -224,7 +224,20 @@ OPTIMIZATION CONTEXT:"""
         
         context += f"""
 
-GUIDELINES:
+GUIDELINES:"""
+        
+        # Objective-specific guidelines
+        if objective == "odor":
+            context += """
+- Generate odorant molecules for fragrance/flavor applications
+- Target volatility window: MW 85-250 Da, LogP 0.5-4, TPSA < 40
+- Consider olfactory descriptors: floral, sweet, fruity, citrus, woody, green
+- Include functional groups relevant to odor: esters, ethers, alcohols, aldehydes
+- Avoid known allergens: cinnamaldehyde-like, nitro groups, strong sensitizers
+- Consider volatility for fragrance layering (top/middle/base notes)
+- Examples: anisole (floral), ethyl acetate (fruity), terpineol (citrus)"""
+        else:
+            context += """
 - Generate chemically valid SMILES strings
 - Focus on improving {objective} while maintaining drug-likeness
 - Consider Lipinski's Rule of Five (MW < 500, LogP < 5, HBD ≤ 5, HBA ≤ 10)
@@ -232,7 +245,28 @@ GUIDELINES:
 - Consider ring systems, heteroatoms, and polarity
 - Avoid overly complex or unstable structures
 
-RESPONSE FORMAT:
+RESPONSE FORMAT:"""
+        
+        if objective == "odor":
+            context += """
+{{
+  "candidates": [
+    {{
+      "smiles": "COc1ccccc1",
+      "reason": "Anisole derivative with sweet floral character, ideal volatility",
+      "descriptors": "floral, sweet",
+      "volatility": "middle"
+    }},
+    {{
+      "smiles": "CCOC(=O)C",
+      "reason": "Ethyl acetate for fruity top note, high volatility",
+      "descriptors": "fruity, sweet",
+      "volatility": "top"
+    }}
+  ]
+}}"""
+        else:
+            context += """
 {{
   "candidates": [
     {{

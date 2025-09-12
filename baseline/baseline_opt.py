@@ -306,6 +306,24 @@ def objective_penalized_logp_simple(mol: Chem.Mol) -> float:
     return float(logp - ring_penalty)
 
 
+def objective_odor(mol: Chem.Mol) -> float:
+    """
+    Odorant-likeness objective using ML oracle.
+    Returns score 0-1 based on molecular properties relevant to olfaction.
+    """
+    if mol is None:
+        return 0.0
+    try:
+        # Import here to avoid circular dependencies
+        from odor_oracle import OdorOracle
+        # Cache oracle instance for performance
+        if not hasattr(objective_odor, '_oracle'):
+            objective_odor._oracle = OdorOracle()
+        return objective_odor._oracle.predict_odor_score(Chem.MolToSmiles(mol))
+    except Exception:
+        return 0.0
+
+
 # ------------------------
 # Filters / constraints
 # ------------------------
@@ -692,6 +710,8 @@ def get_objective(name: str) -> ObjectiveFn:
         return objective_qed
     elif name in ("pen_logp", "penalized_logp", "pen-logp"):
         return objective_penalized_logp_simple
+    elif name in ("odor", "odorant"):
+        return objective_odor
     else:
         raise ValueError(f"Unknown objective: {name}")
 
@@ -950,6 +970,17 @@ def run_optimization(
                 n_candidates=local_cands,
                 random_seed=cfg.random_seed + 123 + r,
             )
+        # Apply odorant filters for odor objectives
+        if cfg.objective == "odor":
+            try:
+                from chemosensory_filters import filter_odorant_candidates
+                pre_filter_count = len(cand_mols)
+                cand_mols = filter_odorant_candidates(cand_mols, verbose=False)
+                if len(cand_mols) < pre_filter_count:
+                    print(f"🧪 Odorant filter: {len(cand_mols)}/{pre_filter_count} candidates passed")
+            except ImportError:
+                print("⚠️ chemosensory_filters not available, skipping odorant filtering")
+        
         # Optional strict scaffold preservation (keep only seed scaffolds)
         if cfg.preserve_seed_scaffold:
             cand_mols = [m for m in cand_mols if murcko_scaffold_smiles(m) in seed_scaffolds]

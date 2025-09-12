@@ -4,24 +4,18 @@
 
 SCALE is a fast, agentic molecular optimizer that designs small molecules under guardrails. It now features **LLM-powered controllers** and **chemosensory optimization** for flavor/fragrance applications.
 
-## 🚀 Key Features
+## ✨ What Makes This Special?
 
-### **🤖 LLM-Powered Intelligence**
-- **LLM Controller**: GPT models make intelligent optimization decisions
-- **LLM Candidate Generator**: AI-powered molecular design with chemical reasoning
-- **Flexible Models**: Support for GPT-4.1, GPT-5, and other models
+### **🤖 AI-Powered**
+- **Smart Decisions**: AI chooses the best optimization strategy each round
+- **Molecule Design**: AI creates new molecules with chemical reasoning
+- **Multiple Models**: Works with GPT-4.1, GPT-5, and other AI models
 
-### **🧪 Chemosensory Optimization**
-- **Odor Preset**: Specialized for fragrance/flavor molecules
-- **Volatility Filters**: MW, LogP, TPSA constraints for odorant properties
-- **Odor Oracle**: ML-based odorant quality prediction
-- **Safety Alerts**: Regulatory and allergen screening
-
-### **⚙️ Core Capabilities**
-- **Scaffold-diverse** (hit finding) vs **scaffold-preserving** (lead optimization)
-- **Physics-aware**: MMFF strain penalties for realistic molecules
-- **Guardrails**: Drug-likeness limits, PAINS filter, safety screening
-- **Agentic**: Per-round adaptive decisions with full logging
+### **🧪 Real Chemistry**
+- **Drug Discovery**: Finds molecules that could become medicines
+- **Fragrance Design**: Creates molecules for perfumes and flavors
+- **Safety First**: Automatically filters out dangerous molecules
+- **Physics Aware**: Considers real molecular properties and constraints
 
 ## 📦 Installation
 
@@ -36,64 +30,91 @@ conda activate llm-agent-chem
 pip install -r requirements.txt
 ```
 
-## 🎯 Quick Start
+## 🚀 Quick Start
 
-### **Basic Drug-like Optimization**
+### **🎯 Step 1: Choose Your Goal**
 ```bash
-python baseline/demo.py --preset qed_sa --rounds 6
-```
+# Find drug-like molecules
+python baseline/demo.py --preset qed_sa --rounds 5
 
-### **🧪 Chemosensory/Odor Optimization**
-```bash
-# Basic odor optimization
+# Find fragrance/flavor molecules  
 python baseline/demo.py --preset odor --rounds 5
-
-# With LLM enhancement
-python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
 ```
 
-### **🤖 LLM-Powered Optimization**
+### **🤖 Step 2: Add AI Power (Optional)**
 ```bash
-# Use LLM controller and candidate generator
-python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 6
+# Let AI make optimization decisions
+python baseline/demo.py --preset qed_sa --llm --rounds 5
 
-# Specify custom model
-python baseline/demo.py --preset qed_sa --llm --model gpt-4o --rounds 6
+# Let AI design new molecules
+python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 5
+
+# Use different AI models
+python baseline/demo.py --preset qed_sa --llm --model gpt-4o --rounds 5
 ```
 
-## 🎯 Application Modes
+**That's it!** Results are saved in `runs/` folder with plots and molecule data.
 
-### **1. Drug Discovery (QED Optimization)**
-- **Seeds**: Drug-like scaffolds (benzene, pyridine, acetamide)
-- **Objective**: Maximize QED score
-- **Filters**: Lipinski's Rule of 5, PAINS screening
+## 📚 Simple Concepts
 
-### **2. Chemosensory/Olfaction** 🧪
-- **Seeds**: Odorant molecules (anisole, ethyl acetate, terpineol)
-- **Objective**: Odorant quality score (ML-based)
-- **Filters**: Volatility window (MW 85-250, LogP 0.5-4, TPSA <40)
-- **Safety**: Allergen and sensitizer alerts
+### **What are QED and Odor Scores?**
+- **QED Score (0-1)**: How "drug-like" a molecule is
+  - 0.0 = Bad for drugs (too big, toxic, etc.)
+  - 1.0 = Perfect drug candidate
+  - Example: Aspirin = 0.65, Caffeine = 0.78
 
-## 🤖 LLM Features
+- **Odor Score (0-1)**: How good a molecule smells/tastes
+  - 0.0 = No interesting smell
+  - 1.0 = Perfect fragrance molecule
+  - Example: Rose scent molecules = 0.8+
 
-### **Setup OpenAI API**
+### **Two Search Strategies**
+- **Explore**: Find completely new types of molecules
+- **Optimize**: Improve one specific molecule family
+
+## 🎯 What Can You Optimize?
+
+SCALE can optimize molecules for different purposes. Just pick your goal:
+
+### **💊 Drug Discovery (QED Score)**
+**Goal**: Find drug-like molecules
+```bash
+python baseline/demo.py --preset qed_sa --rounds 5
+```
+- **QED Score**: 0-1 (higher = more drug-like)
+- **Examples**: Aspirin (0.65), Caffeine (0.78)
+- **Good for**: Pharmaceuticals, medicine development
+
+### **🧪 Fragrance & Flavor (Odor Score)**
+**Goal**: Find molecules that smell/taste good
+```bash
+python baseline/demo.py --preset odor --rounds 5
+```
+- **Odor Score**: 0-1 (higher = better odorant)
+- **Examples**: Anisole (floral), Ethyl acetate (fruity)
+- **Good for**: Perfumes, food flavoring, aromatherapy
+
+### **⚗️ Lipophilicity (LogP Score)**
+**Goal**: Control how molecules interact with fats/oils
+```bash
+python baseline/baseline_opt.py --objective pen_logp --rounds 5
+```
+- **LogP Score**: How well molecules dissolve in fats vs water
+- **Good for**: Membrane permeability, drug absorption
+
+## 🤖 Using AI Features
+
+### **Setup (First Time Only)**
 ```bash
 export OPENAI_API_KEY="your-api-key"
-# Or use our setup script:
-python setup_llm.py
 ```
 
-### **LLM Controller**
-Makes intelligent optimization decisions:
-- **Exploration vs Exploitation**: Adjusts parameters based on progress
-- **Operation Selection**: Chooses between BRICS, attach, or LLM generation
-- **Chemical Reasoning**: Understands when to increase diversity or focus
-
-### **LLM Candidate Generator**
-Generates novel molecules with reasoning:
-- **Chemical Logic**: "Added formyl group to anisole to introduce polarity"
-- **Property Awareness**: Considers MW, LogP, and target objectives
-- **Fallback Safety**: Uses heuristic methods if LLM fails
+### **What the AI Does**
+- **Smart Controller**: Decides when to explore vs optimize based on progress
+- **Molecule Creator**: Designs new molecules with explanations like:
+  - *"Added hydroxyl group to increase water solubility"*
+  - *"Modified aromatic ring for better drug-likeness"*
+- **Safe Fallback**: If AI fails, automatically uses backup methods
 
 ## 📊 Outputs
 
@@ -218,10 +239,26 @@ This project is designed for hackathons and research. Key extension points:
 
 ---
 
-**Ready to design better molecules with AI? Start with a simple demo:**
+## 🎯 Summary
 
+**SCALE makes molecule design simple:**
+
+1. **Pick your goal**: Drug discovery (`qed_sa`) or Fragrance (`odor`)
+2. **Add AI** (optional): `--llm --llm-candidates` 
+3. **Run**: Results automatically saved with plots
+
+**Quick Examples:**
 ```bash
+# Find drug molecules
+python baseline/demo.py --preset qed_sa --rounds 5
+
+# Find fragrance molecules with AI help
 python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
+
+# Compare different strategies
+python baseline/compare_modes.py --rounds 5
 ```
 
-*Watch as GPT generates novel odorant molecules with chemical reasoning!* 🧪✨
+**Perfect for:** Drug discovery, fragrance design, chemistry research, AI experiments
+
+*Ready to design better molecules with AI?* 🧪✨

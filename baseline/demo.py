@@ -88,7 +88,7 @@ def main():
             "CC1=CC=C(C=C1)C(C)C",  # p-cymene (citrus, woody)
         ]
         cfg = OptConfig(
-            objective="qed",  # Will be replaced with odor oracle later
+            objective="odor",  # True odorant optimization
             rounds=args.rounds,
             init_train_size=96,
             candidates_per_round=80,
