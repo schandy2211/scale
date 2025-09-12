@@ -1,5 +1,5 @@
 """
-SCALE Web Interface - AI-Powered Molecular Design
+SCALE Web Interface - AI Agent-Powered Molecular Design
 A sleek, modern web interface for demonstrating our breakthrough chemosensory system.
 """
 
@@ -134,7 +134,7 @@ def run_mixture_demo():
     demo_state['progress'] = 20
     demo_state['ai_reasoning'].append({
         'step': 1,
-        'title': 'Initializing AI Designer',
+        'title': 'Initializing AI Agent Designer',
         'description': 'Loading molecular models...',
         'time': datetime.now().strftime('%H:%M:%S')
     })
@@ -207,7 +207,7 @@ def run_mixture_demo():
     demo_state['results'] = {
         'final_score': round(score, 3),
         'target_score': 0.95,
-        'success': score > 0.9,
+        'success': str(score > 0.9),
         'blend_formula': [
             {
                 'molecule': test_molecules[i][1],
@@ -218,7 +218,7 @@ def run_mixture_demo():
             for i in range(len(test_molecules))
         ],
         'achievement': 'Successfully designed jasmine-like fragrance blend!',
-        'innovation': 'First AI system to solve targeted odor-mixture inverse design'
+        'innovation': 'First AI agent system to solve targeted odor-mixture inverse design'
     }
     
     demo_state['ai_reasoning'].append({
@@ -231,15 +231,15 @@ def run_mixture_demo():
     
 
 def run_molecular_optimization_demo(config, use_ai):
-    """Demo molecular optimization with AI"""
+    """Demo molecular optimization with AI agent"""
     global demo_state
     
-    # Step 1: AI Controller initialization
+    # Step 1: AI Agent Controller initialization
     demo_state['status'] = 'ai_thinking'
     demo_state['progress'] = 30
     demo_state['ai_reasoning'].append({
         'step': 1,
-        'title': 'AI Analyzing Problem',
+        'title': 'AI Agent Analyzing Problem',
         'description': f'Optimizing {config["name"].lower()} molecules',
         'details': f'Target {config["objective"].upper()} score: {config["target_score"]}',
         'time': datetime.now().strftime('%H:%M:%S')
@@ -299,10 +299,10 @@ def run_molecular_optimization_demo(config, use_ai):
     demo_state['results'] = {
         'final_score': best_score,
         'target_score': config['target_score'],
-        'success': best_score > config['target_score'] * 0.9,
+        'success': str(best_score > config['target_score'] * 0.9),
         'molecules_found': len(demo_state['molecules_generated']),
         'achievement': f'Successfully optimized {config["name"].lower()} molecules!',
-        'innovation': 'AI-guided molecular design with chemical reasoning'
+        'innovation': 'AI agent-guided molecular design with chemical reasoning'
     }
     
     demo_state['ai_reasoning'].append({

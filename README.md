@@ -7,8 +7,8 @@ SCALE is a fast, agentic molecular optimizer that designs small molecules under 
 ## ✨ What Makes This Special?
 
 ### **🤖 AI-Powered**
-- **Smart Decisions**: AI chooses the best optimization strategy each round
-- **Molecule Design**: AI creates new molecules with chemical reasoning
+- **Smart Decisions**: AI agent chooses the best optimization strategy each round
+- **Molecule Design**: AI agent creates new molecules with chemical reasoning
 - **Multiple Models**: Works with GPT-4.1, GPT-5, and other AI models
 
 ### **🧪 Real Chemistry**
@@ -52,7 +52,7 @@ python app.py
 
 #### **Access the Demo:**
 - **URL**: `http://localhost:8080`
-- **Features**: Interactive demos with real-time AI reasoning
+- **Features**: Interactive demos with real-time AI agent reasoning
 - **Demos Available**:
   - **💊 Drug Discovery**: Design molecules that make it to lab
   - **🧪 Fragrance Design**: Odorant optimization with volatility & safety  
@@ -62,7 +62,7 @@ python app.py
 - **Real-time Progress**: Watch agent formulate hypotheses and run experiments
 - **Chemical Reasoning**: See agent's experimentation process step-by-step
 - **Visual Results**: Elegant molecule cards and blend formulas
-- **Interactive UI**: Click any demo to see AI in action
+- **Interactive UI**: Click any demo to see AI agent in action
 
 #### **Troubleshooting:**
 - **Port 8080 in use**: The launcher automatically handles port conflicts
@@ -76,7 +76,7 @@ python app.py
 # Find drug-like molecules
 python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 5
 
-# Find fragrance molecules with AI
+# Find fragrance molecules with AI agent
 python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
 ```
 
@@ -129,19 +129,19 @@ python baseline/baseline_opt.py --objective pen_logp --rounds 5
 - **LogP Score**: How well molecules dissolve in fats vs water
 - **Good for**: Membrane permeability, drug absorption
 
-## 🤖 Using AI Features
+## 🤖 Using AI Agent Features
 
 ### **Setup (First Time Only)**
 ```bash
 export OPENAI_API_KEY="your-api-key"
 ```
 
-### **What the AI Does**
+### **What the AI Agent Does**
 - **Smart Controller**: Decides when to explore vs optimize based on progress
 - **Molecule Creator**: Designs new molecules with explanations like:
   - *"Added hydroxyl group to increase water solubility"*
   - *"Modified aromatic ring for better drug-likeness"*
-- **Safe Fallback**: If AI fails, automatically uses backup methods
+- **Safe Fallback**: If AI agent fails, automatically uses backup methods
 
 ## 📊 Outputs
 
@@ -234,7 +234,7 @@ agent/
 - Novel aroma molecule generation
 
 ### **🔬 Research**
-- AI-driven molecular hypothesis generation
+- AI agent-driven molecular hypothesis generation
 - Chemical space exploration
 - Benchmarking molecular optimization algorithms
 
@@ -271,7 +271,7 @@ This project is designed for hackathons and research. Key extension points:
 **SCALE makes molecule design simple:**
 
 1. **Pick your goal**: Drug discovery (`qed_sa`) or Fragrance (`odor`)
-2. **Add AI** (optional): `--llm --llm-candidates` 
+2. **Add AI agent** (optional): `--llm --llm-candidates` 
 3. **Run**: Results automatically saved with plots
 
 **Quick Examples:**
@@ -279,13 +279,13 @@ This project is designed for hackathons and research. Key extension points:
 # Find drug molecules
 python baseline/demo.py --preset qed_sa --rounds 5
 
-# Find fragrance molecules with AI help
+# Find fragrance molecules with AI agent help
 python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
 
 # Compare different strategies
 python baseline/compare_modes.py --rounds 5
 ```
 
-**Perfect for:** Drug discovery, fragrance design, chemistry research, AI experiments
+**Perfect for:** Drug discovery, fragrance design, chemistry research, AI agent experiments
 
-*Ready to design better molecules with AI?* 🧪✨
+*Ready to design better molecules with AI agent?* 🧪✨

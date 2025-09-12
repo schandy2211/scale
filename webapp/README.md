@@ -29,7 +29,7 @@ python app.py
 
 ### **Access the Demo:**
 - **URL**: `http://localhost:8080`
-- **Features**: Interactive demos with real-time AI reasoning
+- **Features**: Interactive demos with real-time AI agent reasoning
 - **Stop Server**: Press `Ctrl+C` in terminal
 
 ### **Troubleshooting:**
@@ -41,7 +41,7 @@ python app.py
 
 ## 🎯 Demo Features
 
-### **Three AI Demos**
+### **Three AI Agent Demos**
 
 1. **💊 Drug Discovery**
    - Design molecules that make it to lab
