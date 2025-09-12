@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Molecular Designer - Demo</title>
+    <style>
+        :root {
+            --color-bg-primary: #0a0a0a;
+            --color-bg-secondary: #1a1a1a;
+            --color-bg-tertiary: #2a2a2a;
+            --color-text-primary: #ffffff;
+            --color-text-secondary: #b3b3b3;
+            --color-text-muted: #666666;
+            --color-accent: #3b82f6;
+            --color-accent-hover: #2563eb;
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --border-radius: 8px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        /* Header */
+        .header {
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid #333;
+            padding: var(--spacing-lg) 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .back-btn {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid #444;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        /* Demo Content */
+        .demo-content {
+            padding: var(--spacing-xl) 0;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .demo-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-accent);
+        }
+
+        .demo-description {
+            font-size: 18px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .input-info {
+            background: var(--color-bg-secondary);
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .input-info h3 {
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .input-info p {
+            color: var(--color-text-secondary);
+            font-family: monospace;
+            font-size: 16px;
+        }
+
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .progress-bar {
+            background: var(--color-bg-tertiary);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--color-accent), var(--color-success));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        /* AI Reasoning Steps */
+        .reasoning-container {
+            margin-top: var(--spacing-lg);
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+            scroll-behavior: smooth;
+        }
+
+        .reasoning-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .reasoning-container::-webkit-scrollbar-track {
+            background: var(--color-bg-secondary);
+            border-radius: 3px;
+        }
+
+        .reasoning-container::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 3px;
+        }
+
+        .reasoning-step {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            border-left: 4px solid var(--color-accent);
+            transition: all 0.2s ease;
+        }
+
+        .reasoning-step:hover {
+            background: var(--color-bg-secondary);
+            transform: translateX(2px);
+        }
+
+        .reasoning-step.latest {
+            border-left-color: var(--color-success);
+            background: rgba(34, 197, 94, 0.1);
+            animation: pulse 2s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(4px); }
+            100% { transform: translateX(0); }
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .step-number {
+            background: var(--color-accent);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-title {
+            flex: 1;
+            margin-left: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        .step-time {
+            color: var(--color-text-muted);
+            font-size: 12px;
+        }
+
+        .step-description {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .step-details {
+            color: var(--color-text-muted);
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        /* Chemical Reasoning */
+        .chemical-reasoning {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--color-accent);
+        }
+
+        .chemical-reasoning h4 {
+            color: var(--color-accent);
+            font-size: 14px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .reasoning-section {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .reasoning-section strong {
+            color: var(--color-text-primary);
+        }
+
+        .reasoning-section ul {
+            margin-left: var(--spacing-lg);
+            margin-top: var(--spacing-xs);
+        }
+
+        .reasoning-section li {
+            margin-bottom: var(--spacing-xs);
+            color: var(--color-text-secondary);
+        }
+
+        /* Results */
+        .results-container {
+            display: none;
+            margin-top: var(--spacing-lg);
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--color-success);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .achievement-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* Molecules Carousel */
+        .molecules-section {
+            margin-top: 24px;
+        }
+
+        .molecules-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .molecules-header h4 {
+            color: var(--color-accent);
+            margin: 0;
+        }
+
+        .molecule-counter {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .molecules-carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            background: var(--color-bg-secondary);
+            border: 1px solid #333;
+        }
+
+        .molecules-carousel {
+            display: flex;
+            transition: transform 0.3s ease;
+            padding: 16px;
+            gap: 16px;
+        }
+
+        .molecule-card-carousel {
+            min-width: 320px;
+            max-width: 320px;
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            transform: scale(0.95);
+        }
+
+        .molecule-card-carousel.active {
+            opacity: 1;
+            transform: scale(1);
+            border-color: var(--color-accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .molecule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .molecule-header .molecule-smiles {
+            font-family: monospace;
+            font-size: 16px;
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .molecule-header .molecule-score {
+            background: var(--color-success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .molecule-description {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .llm-reasoning-compact {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--border-radius);
+            padding: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .llm-reasoning-compact .reasoning-header {
+            font-weight: 600;
+            color: #3b82f6;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .llm-reasoning-compact .reasoning-text {
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .llm-reasoning-compact .modification-type {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .chemical-analysis-compact {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .chemical-analysis-compact .property-change,
+        .chemical-analysis-compact .volatility,
+        .chemical-analysis-compact .descriptors {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--color-bg-tertiary);
+            border-top: 1px solid #333;
+        }
+
+        .carousel-btn {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .carousel-btn:hover {
+            background: var(--color-accent-hover);
+            transform: scale(1.1);
+        }
+
+        .carousel-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            background: var(--color-accent);
+            transform: scale(1.2);
+        }
+
+        .dot:hover {
+            background: var(--color-accent);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid #444;
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-secondary);
+        }
+
+        .start-demo-btn {
+            background: var(--color-accent);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .start-demo-btn:hover {
+            background: var(--color-accent-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            margin-top: var(--spacing-xl);
+            background: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            border: 1px solid #333;
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .progress-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .progress-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+
+        /* Comprehensive Results */
+        .comprehensive-results {
+            margin-top: var(--spacing-xl);
+            background: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            border: 1px solid #333;
+        }
+
+        .comprehensive-results h3 {
+            color: var(--color-accent);
+            font-size: 20px;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .comparison-section, .improvements-section, .plot-section, .files-section, .actions-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .molecule-card {
+            background: var(--color-bg-primary);
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+        }
+
+        .molecule-card.original {
+            border-color: #666;
+        }
+
+        .molecule-card.optimized {
+            border-color: var(--color-accent);
+        }
+
+        .molecule-card h4 {
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
+            font-size: 18px;
+        }
+
+        .smiles-display {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: var(--spacing-md);
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-md);
+            word-break: break-all;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .property-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-xs);
+            background: #2a2a2a;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .property-label {
+            color: var(--color-text-secondary);
+        }
+
+        .property-value {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .reasoning {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: #1a2a1a;
+            border-left: 3px solid var(--color-accent);
+            border-radius: 4px;
+            font-style: italic;
+            color: var(--color-text-secondary);
+        }
+
+        .improvements-table {
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .improvement-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-bottom: 1px solid #333;
+            align-items: center;
+        }
+
+        .improvement-row:first-child {
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
+            font-weight: 600;
+        }
+
+        .improvement-row:not(:first-child):hover {
+            background: #2a2a2a;
+        }
+
+        .change-positive {
+            color: #4ade80;
+        }
+
+        .change-negative {
+            color: #f87171;
+        }
+
+        .change-neutral {
+            color: var(--color-text-secondary);
+        }
+
+        .plots-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .plot-item {
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .plot-item h4 {
+            color: var(--color-accent);
+            margin-bottom: var(--spacing-xs);
+            font-size: 16px;
+        }
+
+        .plot-description {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--spacing-md);
+            font-style: italic;
+        }
+
+        .plot-explanation {
+            color: var(--color-text-primary);
+            font-size: 13px;
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-sm);
+            background: #1a1a1a;
+            border-left: 3px solid var(--color-accent);
+            border-radius: 4px;
+            line-height: 1.4;
+        }
+
+        .plot-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .plots-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .file-item {
+            background: var(--color-bg-primary);
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover {
+            border-color: var(--color-accent);
+            background: #2a2a2a;
+        }
+
+        .file-icon {
+            font-size: 24px;
+            color: var(--color-accent);
+        }
+
+        .file-info h4 {
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+            font-size: 14px;
+        }
+
+        .file-info p {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+        }
+
+        .action-btn {
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--color-accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .copy-btn {
+            background: #10b981;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+        }
+
+        .download-btn {
+            background: #3b82f6;
+        }
+
+        .download-btn:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">🧬 AI Molecular Designer</div>
+                <a href="/" class="back-btn">← Back to Home</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="demo-content">
+        <div class="container">
+            <div class="demo-header">
+                <h1 class="demo-title" id="demoTitle">Loading...</h1>
+                <p class="demo-description" id="demoDescription">Loading...</p>
+            </div>
+
+            <div class="input-info" id="inputInfo">
+                <h3>Input Parameters</h3>
+                <p id="inputDetails">Loading...</p>
+            </div>
+
+            <button class="start-demo-btn" id="startDemoBtn" onclick="startDemo()">Start Demo</button>
+
+            <!-- Progress Section (shown after demo starts) -->
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-header">
+                    <h2 class="progress-title" id="progressTitle">AI Molecular Designer</h2>
+                    <p class="progress-subtitle" id="progressSubtitle">Initializing...</p>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0% Complete</div>
+                </div>
+
+                <div class="reasoning-container" id="reasoningContainer">
+                    <!-- AI reasoning steps will appear here -->
+                </div>
+
+                <div class="results-container" id="resultsContainer">
+                    <!-- Results will appear here -->
+                </div>
+                
+                <!-- Comprehensive Results Section -->
+                <div class="comprehensive-results" id="comprehensiveResults" style="display: none;">
+                    <!-- Before/After Comparison -->
+                    <div class="comparison-section">
+                        <h3>Before vs After Comparison</h3>
+                        <div class="comparison-grid">
+                            <div class="molecule-card original">
+                                <h4>Original Molecule</h4>
+                                <div class="smiles-display" id="originalSmiles">Loading...</div>
+                                <div class="properties-grid" id="originalProperties"></div>
+                            </div>
+                            <div class="molecule-card optimized">
+                                <h4>Optimized Molecule</h4>
+                                <div class="smiles-display" id="optimizedSmiles">Loading...</div>
+                                <div class="properties-grid" id="optimizedProperties"></div>
+                                <div class="reasoning" id="optimizationReasoning"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Improvements Table -->
+                    <div class="improvements-section">
+                        <h3>Property Improvements</h3>
+                        <div class="improvements-table" id="improvementsTable"></div>
+                    </div>
+                    
+                    <!-- Optimization Plots -->
+                    <div class="plot-section">
+                        <h3>Optimization Analysis</h3>
+                        <div class="plots-grid" id="plotsGrid">
+                            <!-- Professional plots will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Generated Files -->
+                    <div class="files-section">
+                        <h3>Generated Files</h3>
+                        <div class="files-grid" id="filesGrid">
+                            <!-- JSON files will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Download/Copy Actions -->
+                    <div class="actions-section">
+                        <h3>Export Results</h3>
+                        <div class="action-buttons">
+                            <button class="action-btn copy-btn" onclick="copySMILES()">
+                                📋 Copy Best SMILES
+                            </button>
+                            <button class="action-btn download-btn" onclick="downloadResults()">
+                                💾 Download Results
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentDemo = '';
+        let progressInterval = null;
+        let currentMoleculeIndex = 0;
+        let totalMolecules = 0;
+
+        // Load demo data from session storage
+        window.addEventListener('DOMContentLoaded', function() {
+            const demoType = sessionStorage.getItem('demoType');
+            const tabType = sessionStorage.getItem('tabType');
+            const inputData = JSON.parse(sessionStorage.getItem('demoInput') || '{}');
+
+            if (!demoType) {
+                window.location.href = '/';
+                return;
+            }
+
+            currentDemo = demoType;
+            updateDemoInfo(demoType, tabType, inputData);
+        });
+
+        function updateDemoInfo(demoType, tabType, inputData) {
+            const configs = {
+                'drug_discovery': {
+                    name: 'Drug Discovery',
+                    description: 'QED (drug-likeness) & LogP (lipophilicity) enhancement',
+                    inputDetails: `Starting molecule: ${inputData.smiles || 'Not specified'}`
+                },
+                'fragrance_design': {
+                    name: 'Chemosensory Design',
+                    description: 'Odor optimization with volatility & safety + fragrance profile design',
+                    inputDetails: `Fragrance type: ${inputData.fragrance_type || 'Not specified'}`
+                }
+            };
+
+            const config = configs[demoType];
+            if (config) {
+                document.getElementById('demoTitle').textContent = config.name;
+                document.getElementById('demoDescription').textContent = config.description;
+                document.getElementById('inputDetails').textContent = config.inputDetails;
+            }
+        }
+
+        function startDemo() {
+            const demoType = sessionStorage.getItem('demoType');
+            const tabType = sessionStorage.getItem('tabType');
+            const inputData = JSON.parse(sessionStorage.getItem('demoInput') || '{}');
+
+            // Hide start button and show progress section
+            document.getElementById('startDemoBtn').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'block';
+            
+            // Update progress header
+            document.getElementById('progressTitle').textContent = `AI ${demoType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
+            document.getElementById('progressSubtitle').textContent = 'Initializing...';
+
+            // Reset UI
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '0% Complete';
+            document.getElementById('reasoningContainer').innerHTML = '';
+            document.getElementById('resultsContainer').style.display = 'none';
+
+            // Start optimization
+            fetch('/api/start_optimization', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    demo_type: demoType,
+                    tab_type: tabType,
+                    use_ai: true,
+                    input_data: inputData
+                })
+            });
+
+            // Start polling
+            startProgressPolling();
+        }
+
+        function startProgressPolling() {
+            if (progressInterval) clearInterval(progressInterval);
+            
+            progressInterval = setInterval(() => {
+                fetch('/api/status')
+                    .then(response => response.json())
+                    .then(data => updateProgress(data))
+                    .catch(error => console.error('Error:', error));
+            }, 1000);
+        }
+
+        function updateProgress(data) {
+            // Update progress bar
+            document.getElementById('progressFill').style.width = data.progress + '%';
+            document.getElementById('progressText').textContent = data.progress + '% Complete';
+            
+            // Add new reasoning steps
+            if (data.ai_reasoning && data.ai_reasoning.length > 0) {
+                const container = document.getElementById('reasoningContainer');
+                const lastStep = data.ai_reasoning[data.ai_reasoning.length - 1];
+                
+                // Check if this step is already displayed
+                if (!document.getElementById(`step-${lastStep.step}`)) {
+                    const stepElement = createReasoningStep(lastStep);
+                    container.appendChild(stepElement);
+                    
+                    // Auto-scroll to show the latest step
+                    setTimeout(() => {
+                        scrollToLatestReasoningStep();
+                    }, 100);
+                }
+            }
+            
+            // Show results if completed
+            if (data.status === 'completed' && data.results) {
+                showResults(data.results, data.molecules_generated);
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                }
+            }
+        }
+
+        function createReasoningStep(step) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'reasoning-step latest';
+            stepDiv.id = `step-${step.step}`;
+            
+            // Remove 'latest' class after animation
+            setTimeout(() => {
+                stepDiv.classList.remove('latest');
+            }, 2000);
+            
+            const statusClass = getStatusClass(step.title);
+            
+            // Build chemical reasoning HTML if present
+            let chemicalReasoningHTML = '';
+            if (step.chemical_reasoning) {
+                chemicalReasoningHTML = '<div class="chemical-reasoning"><h4>🧪 Chemical Analysis</h4>';
+                
+                // Handle different types of chemical reasoning
+                if (step.chemical_reasoning.target_notes) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Target Notes:</strong> ' + 
+                        step.chemical_reasoning.target_notes.join(', ') + '</div>';
+                }
+                
+                if (step.chemical_reasoning.key_functional_groups) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Key Functional Groups:</strong> ' + 
+                        step.chemical_reasoning.key_functional_groups.join(', ') + '</div>';
+                }
+                
+                if (step.chemical_reasoning.molecular_requirements) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Molecular Requirements:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.molecular_requirements)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.scaffold_analysis) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Scaffold Analysis:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.scaffold_analysis)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.functional_group_strategy) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Functional Group Strategy:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.functional_group_strategy)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.mixture_strategy) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Mixture Strategy:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.mixture_strategy)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.synergistic_effects) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Synergistic Effects:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.synergistic_effects)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.objective_analysis) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Objective Analysis:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.objective_analysis)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.modification_strategy) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Modification Strategy:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.modification_strategy)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.candidate_analysis) {
+                    const candidate = step.chemical_reasoning.candidate_analysis;
+                    chemicalReasoningHTML += '<div class="reasoning-section candidate-analysis">';
+                    chemicalReasoningHTML += '<strong>🧬 Candidate Analysis:</strong>';
+                    chemicalReasoningHTML += `<div class="candidate-smiles">${candidate.smiles}</div>`;
+                    if (candidate.llm_reasoning) {
+                        chemicalReasoningHTML += `<div class="candidate-reasoning">${candidate.llm_reasoning}</div>`;
+                    }
+                    if (candidate.modification_type) {
+                        chemicalReasoningHTML += `<div class="modification-type">Type: ${candidate.modification_type}</div>`;
+                    }
+                    if (candidate.property_changes) {
+                        chemicalReasoningHTML += '<div class="property-changes">';
+                        for (const [key, value] of Object.entries(candidate.property_changes)) {
+                            chemicalReasoningHTML += `<div><strong>${key}:</strong> ${value}</div>`;
+                        }
+                        chemicalReasoningHTML += '</div>';
+                    }
+                    chemicalReasoningHTML += '</div>';
+                }
+                
+                chemicalReasoningHTML += '</div>';
+            }
+            
+            stepDiv.innerHTML = `
+                <div class="step-header">
+                    <div class="step-number">${step.step}</div>
+                    <div class="step-title">
+                        <span class="status-indicator ${statusClass}"></span>
+                        ${step.title}
+                    </div>
+                    <div class="step-time">${step.time}</div>
+                </div>
+                <div class="step-description">${step.description}</div>
+                ${step.details ? `<div class="step-details">${step.details}</div>` : ''}
+                ${chemicalReasoningHTML}
+            `;
+            
+            return stepDiv;
+        }
+
+        function getStatusClass(title) {
+            if (title.includes('Initializing') || title.includes('Analyzing')) return 'thinking';
+            if (title.includes('Generating') || title.includes('Exploring')) return 'working';
+            if (title.includes('Results') || title.includes('Completed')) return 'completed';
+            return 'thinking';
+        }
+
+        function scrollToLatestReasoningStep() {
+            const container = document.getElementById('reasoningContainer');
+            if (container) {
+                // Smooth scroll to bottom to show the latest step
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function showResults(results, molecules) {
+            const container = document.getElementById('resultsContainer');
+            
+            let resultsHTML = `
+                <div class="results-header">
+                    <div class="score-display">${results.final_score}</div>
+                    <div class="achievement-text">${results.achievement}</div>
+                    <p style="color: var(--color-text-muted); margin-top: 8px;">${results.innovation}</p>
+                </div>
+            `;
+
+            // Show blend formula for mixture optimization
+            if (results.blend_formula) {
+                resultsHTML += `
+                    <div class="blend-container">
+                        <h4 style="margin-bottom: 16px; color: var(--color-accent);">🎭 Optimal Blend Formula</h4>
+                        ${results.blend_formula.map(item => `
+                            <div class="blend-item">
+                                <div>
+                                    <div style="font-weight: 600;">${item.molecule}</div>
+                                    <div style="font-family: monospace; font-size: 12px; color: var(--color-text-muted);">${item.smiles}</div>
+                                </div>
+                                <div class="blend-percentage">${item.percentage}%</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Show generated molecules in horizontal carousel
+            if (molecules && molecules.length > 0) {
+                resultsHTML += `
+                    <div class="molecules-section">
+                        <div class="molecules-header">
+                            <h4>🧬 Generated Molecules</h4>
+                            <div class="molecule-counter">${molecules.length} candidates</div>
+                        </div>
+                        <div class="molecules-carousel-container">
+                            <div class="molecules-carousel" id="moleculesCarousel">
+                                ${molecules.map((mol, index) => `
+                                    <div class="molecule-card-carousel ${index === 0 ? 'active' : ''}" data-index="${index}">
+                                        <div class="molecule-header">
+                                            <div class="molecule-smiles">${mol.smiles}</div>
+                                            <div class="molecule-score">${mol.score}</div>
+                                        </div>
+                                        <div class="molecule-description">${mol.description}</div>
+                                        ${mol.llm_reasoning ? `
+                                            <div class="llm-reasoning-compact">
+                                                <div class="reasoning-header">🤖 AI Reasoning</div>
+                                                <div class="reasoning-text">${mol.llm_reasoning}</div>
+                                                ${mol.modification_type ? `<div class="modification-type">${mol.modification_type}</div>` : ''}
+                                                ${mol.chemical_analysis ? `
+                                                    <div class="chemical-analysis-compact">
+                                                        ${mol.chemical_analysis.property_change ? `<div class="property-change">${mol.chemical_analysis.property_change}</div>` : ''}
+                                                        ${mol.chemical_analysis.volatility ? `<div class="volatility">${mol.chemical_analysis.volatility}</div>` : ''}
+                                                        ${mol.chemical_analysis.descriptors ? `<div class="descriptors">${mol.chemical_analysis.descriptors}</div>` : ''}
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn prev-btn" onclick="scrollMolecules(-1)">‹</button>
+                                <div class="carousel-dots">
+                                    ${molecules.map((_, index) => `
+                                        <span class="dot ${index === 0 ? 'active' : ''}" onclick="goToMolecule(${index})"></span>
+                                    `).join('')}
+                                </div>
+                                <button class="carousel-btn next-btn" onclick="scrollMolecules(1)">›</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = resultsHTML;
+            container.style.display = 'block';
+            
+            // Initialize carousel if molecules are present
+            if (molecules && molecules.length > 0) {
+                initializeCarousel(molecules);
+            }
+            
+            // Display comprehensive results if available
+            if (results.comprehensive) {
+                displayComprehensiveResults(results.comprehensive);
+            }
+        }
+
+        // Carousel functionality
+        function scrollMolecules(direction) {
+            const carousel = document.getElementById('moleculesCarousel');
+            if (!carousel) return;
+
+            const cards = carousel.querySelectorAll('.molecule-card-carousel');
+            totalMolecules = cards.length;
+            
+            currentMoleculeIndex += direction;
+            
+            // Handle bounds
+            if (currentMoleculeIndex < 0) currentMoleculeIndex = totalMolecules - 1;
+            if (currentMoleculeIndex >= totalMolecules) currentMoleculeIndex = 0;
+            
+            updateCarousel();
+        }
+
+        function goToMolecule(index) {
+            currentMoleculeIndex = index;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const carousel = document.getElementById('moleculesCarousel');
+            if (!carousel) return;
+
+            const cards = carousel.querySelectorAll('.molecule-card-carousel');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            
+            // Update active card
+            cards.forEach((card, index) => {
+                card.classList.toggle('active', index === currentMoleculeIndex);
+            });
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentMoleculeIndex);
+            });
+            
+            // Update button states
+            if (prevBtn) prevBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
+            
+            // Scroll to active card
+            const cardWidth = 320 + 16; // card width + gap
+            const scrollPosition = currentMoleculeIndex * cardWidth;
+            carousel.style.transform = `translateX(-${scrollPosition}px)`;
+        }
+
+        // Initialize carousel when results are shown (no auto-scroll)
+        function initializeCarousel(molecules) {
+            setTimeout(() => {
+                currentMoleculeIndex = 0;
+                totalMolecules = molecules ? molecules.length : 0;
+                updateCarousel();
+            }, 100);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                scrollMolecules(-1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                scrollMolecules(1);
+            }
+        });
+        
+        // Comprehensive Results Functions
+        function displayComprehensiveResults(comprehensive) {
+            const comprehensiveResults = document.getElementById('comprehensiveResults');
+            comprehensiveResults.style.display = 'block';
+            
+            // Display before/after comparison
+            displayComparison(comprehensive.comparison);
+            
+            // Display improvements table
+            displayImprovements(comprehensive.improvements);
+            
+            // Display plots
+            displayPlots(comprehensive.plots);
+            
+            // Display files
+            displayFiles(comprehensive.files);
+            
+            // Store data for copy/download functions
+            window.currentResults = comprehensive;
+        }
+        
+        function displayComparison(comparison) {
+            document.getElementById('originalSmiles').textContent = comparison.original.smiles;
+            document.getElementById('optimizedSmiles').textContent = comparison.optimized.smiles;
+            
+            // Display original properties
+            const originalProps = document.getElementById('originalProperties');
+            originalProps.innerHTML = formatProperties(comparison.original.properties);
+            
+            // Display optimized properties
+            const optimizedProps = document.getElementById('optimizedProperties');
+            optimizedProps.innerHTML = formatProperties(comparison.optimized.properties);
+            
+            // Display reasoning
+            document.getElementById('optimizationReasoning').textContent = comparison.optimized.reasoning;
+        }
+        
+        function formatProperties(properties) {
+            if (!properties || Object.keys(properties).length === 0) {
+                return '<div class="property-item"><span class="property-label">No data</span></div>';
+            }
+            
+            const propertyLabels = {
+                'molecular_weight': 'MW',
+                'logp': 'LogP',
+                'qed': 'QED',
+                'hbd': 'HBD',
+                'hba': 'HBA',
+                'tpsa': 'TPSA',
+                'rotatable_bonds': 'RotBonds',
+                'aromatic_rings': 'AroRings',
+                'heavy_atoms': 'HeavyAtoms'
+            };
+            
+            return Object.entries(properties)
+                .filter(([key, value]) => value !== undefined && value !== null)
+                .map(([key, value]) => `
+                    <div class="property-item">
+                        <span class="property-label">${propertyLabels[key] || key}</span>
+                        <span class="property-value">${typeof value === 'number' ? value.toFixed(2) : value}</span>
+                    </div>
+                `).join('');
+        }
+        
+        function displayImprovements(improvements) {
+            const table = document.getElementById('improvementsTable');
+            
+            if (!improvements || Object.keys(improvements).length === 0) {
+                table.innerHTML = '<div class="improvement-row"><span>No improvement data available</span></div>';
+                return;
+            }
+            
+            const propertyLabels = {
+                'qed': 'QED',
+                'logp': 'LogP',
+                'molecular_weight': 'MW',
+                'hbd': 'HBD',
+                'hba': 'HBA',
+                'tpsa': 'TPSA'
+            };
+            
+            let html = `
+                <div class="improvement-row">
+                    <span>Property</span>
+                    <span>Original</span>
+                    <span>Optimized</span>
+                    <span>Change</span>
+                    <span>% Change</span>
+                </div>
+            `;
+            
+            Object.entries(improvements).forEach(([prop, data]) => {
+                const changeClass = data.change > 0 ? 'change-positive' : 
+                                  data.change < 0 ? 'change-negative' : 'change-neutral';
+                const changeSign = data.change > 0 ? '+' : '';
+                
+                html += `
+                    <div class="improvement-row">
+                        <span>${propertyLabels[prop] || prop}</span>
+                        <span>${data.original}</span>
+                        <span>${data.optimized}</span>
+                        <span class="${changeClass}">${changeSign}${data.change}</span>
+                        <span class="${changeClass}">${changeSign}${data.percent_change}%</span>
+                    </div>
+                `;
+            });
+            
+            table.innerHTML = html;
+        }
+        
+        function displayPlots(plotsData) {
+            const plotsGrid = document.getElementById('plotsGrid');
+            
+            if (!plotsData || Object.keys(plotsData).length === 0) {
+                plotsGrid.innerHTML = '<p>No plot data available</p>';
+                return;
+            }
+            
+            const plotTitles = {
+                'curves': 'Learning Curves',
+                'top_grid': 'Top Molecules Grid',
+                'scaffolds': 'Scaffold Diversity',
+                'qed_vs_sa': 'QED vs SA Analysis'
+            };
+            
+            const plotDescriptions = {
+                'curves': 'Best/average scores over optimization rounds',
+                'top_grid': 'Visual grid of highest-scoring molecules',
+                'scaffolds': 'Chemical scaffold diversity analysis',
+                'qed_vs_sa': 'Drug-likeness vs synthetic accessibility'
+            };
+            
+            const plotExplanations = {
+                'curves': 'Shows how the AI agent learns and improves molecular designs over time. Rising curves indicate successful optimization with the agent finding better molecules in later rounds.',
+                'top_grid': 'Displays the chemical structures of the best molecules discovered. Each structure shows the SMILES notation and score, allowing visual inspection of successful designs.',
+                'scaffolds': 'Reveals the chemical diversity of explored molecules by analyzing core scaffolds. Higher diversity indicates broader chemical space exploration vs focused optimization.',
+                'qed_vs_sa': 'Plots drug-likeness against synthetic accessibility. Ideal molecules appear in the top-right (high QED, low SA penalty) showing they are both drug-like and synthesizable.'
+            };
+            
+            let html = '';
+            for (const [plotKey, plotData] of Object.entries(plotsData)) {
+                if (plotData) {
+                    const title = plotTitles[plotKey] || plotKey.replace('_', ' ').toUpperCase();
+                    const description = plotDescriptions[plotKey] || '';
+                    const explanation = plotExplanations[plotKey] || '';
+                    html += `
+                        <div class="plot-item">
+                            <h4>${title}</h4>
+                            <p class="plot-description">${description}</p>
+                            <img src="${plotData}" alt="${title}" />
+                            <p class="plot-explanation">${explanation}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            plotsGrid.innerHTML = html || '<p>No plots available</p>';
+        }
+        
+        function displayFiles(filesData) {
+            const filesGrid = document.getElementById('filesGrid');
+            
+            if (!filesData || Object.keys(filesData).length === 0) {
+                filesGrid.innerHTML = '<p>No files available</p>';
+                return;
+            }
+            
+            let html = '';
+            for (const [fileKey, fileInfo] of Object.entries(filesData)) {
+                html += `
+                    <div class="file-item" onclick="alert('File: ${fileInfo.filename}\\nPath: ${fileInfo.path}')">
+                        <div class="file-icon">📄</div>
+                        <div class="file-info">
+                            <h4>${fileInfo.filename}</h4>
+                            <p>${fileInfo.description}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            filesGrid.innerHTML = html;
+        }
+        
+        function copySMILES() {
+            if (window.currentResults && window.currentResults.comparison) {
+                const smiles = window.currentResults.comparison.optimized.smiles;
+                navigator.clipboard.writeText(smiles).then(() => {
+                    alert('SMILES copied to clipboard!');
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = smiles;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('SMILES copied to clipboard!');
+                });
+            }
+        }
+        
+        function downloadResults() {
+            if (window.currentResults) {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    results: window.currentResults
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `molecular_optimization_results_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -322,17 +322,50 @@
         /* AI Reasoning Steps */
         .reasoning-container {
             margin-top: var(--spacing-lg);
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+            scroll-behavior: smooth;
+        }
+
+        .reasoning-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .reasoning-container::-webkit-scrollbar-track {
+            background: var(--color-bg-secondary);
+            border-radius: 3px;
+        }
+
+        .reasoning-container::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 3px;
         }
 
         .reasoning-step {
             background: var(--color-bg-tertiary);
             border-radius: var(--border-radius);
-            padding: var(--spacing-md);
-            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
             border-left: 4px solid var(--color-accent);
-            opacity: 0;
-            transform: translateY(20px);
-            animation: slideIn 0.5s ease forwards;
+            transition: all 0.2s ease;
+        }
+
+        .reasoning-step:hover {
+            background: var(--color-bg-secondary);
+            transform: translateX(2px);
+        }
+
+        .reasoning-step.latest {
+            border-left-color: var(--color-success);
+            background: rgba(34, 197, 94, 0.1);
+            animation: pulse 2s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(4px); }
+            100% { transform: translateX(0); }
         }
 
         @keyframes slideIn {
@@ -576,6 +609,336 @@
             margin-bottom: 2px;
         }
 
+        /* Molecules Carousel */
+        .molecules-section {
+            margin-top: 24px;
+        }
+
+        .molecules-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .molecules-header h4 {
+            color: var(--color-accent);
+            margin: 0;
+        }
+
+        .molecule-counter {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .molecules-carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            background: var(--color-bg-secondary);
+            border: 1px solid #333;
+        }
+
+        .molecules-carousel {
+            display: flex;
+            transition: transform 0.3s ease;
+            padding: 16px;
+            gap: 16px;
+        }
+
+        .molecule-card-carousel {
+            min-width: 320px;
+            max-width: 320px;
+            background: var(--color-bg-primary);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            transform: scale(0.95);
+        }
+
+        .molecule-card-carousel.active {
+            opacity: 1;
+            transform: scale(1);
+            border-color: var(--color-accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .molecule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .molecule-header .molecule-smiles {
+            font-family: monospace;
+            font-size: 16px;
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .molecule-header .molecule-score {
+            background: var(--color-success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .molecule-description {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .llm-reasoning-compact {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--border-radius);
+            padding: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .llm-reasoning-compact .reasoning-header {
+            font-weight: 600;
+            color: #3b82f6;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .llm-reasoning-compact .reasoning-text {
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .llm-reasoning-compact .modification-type {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .chemical-analysis-compact {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .chemical-analysis-compact .property-change,
+        .chemical-analysis-compact .volatility,
+        .chemical-analysis-compact .descriptors {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--color-bg-tertiary);
+            border-top: 1px solid #333;
+        }
+
+        .carousel-btn {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .carousel-btn:hover {
+            background: var(--color-accent-hover);
+            transform: scale(1.1);
+        }
+
+        .carousel-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            background: var(--color-accent);
+            transform: scale(1.2);
+        }
+
+        .dot:hover {
+            background: var(--color-accent);
+        }
+
+        /* Input Dialog Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #333;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-header h2 {
+            color: var(--color-accent);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--color-text-primary);
+        }
+
+        .modal-body {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .input-section h3 {
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .input-section p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .input-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: var(--spacing-sm);
+            background: var(--color-bg-primary);
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            color: var(--color-text-primary);
+            font-size: 14px;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .input-group small {
+            display: block;
+            color: var(--color-text-muted);
+            font-size: 12px;
+            margin-top: var(--spacing-xs);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-sm);
+        }
+
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid #444;
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-secondary);
+        }
+
         /* Blend Formula */
         .blend-container {
             margin-top: var(--spacing-lg);
@@ -744,43 +1107,113 @@
         const demoConfigs = {{ configs | tojson }};
 
         function startDemo(configType, tabType = null) {
-            currentDemo = configType;
-            let config = demoConfigs[configType];
+            const config = demoConfigs[configType];
+            const tabConfig = tabType && config.tabs ? config.tabs[tabType] : config;
             
-            // If there's a tab, use the tab config instead
-            if (tabType && config.tabs) {
-                config = config.tabs[tabType];
-                // Add the tab type to the config for backend processing
-                config.tabType = tabType;
-                config.parentType = configType;
+            // Show input dialog
+            showInputDialog(configType, tabType, tabConfig);
+        }
+
+        // Input dialog functionality
+        function showInputDialog(configType, tabType, config) {
+            const inputHtml = getInputDialogHtml(configType, config);
+            
+            // Create modal for input
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${config.name}</h2>
+                        <button class="close-btn" onclick="closeInputModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        ${inputHtml}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeInputModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="proceedWithDemo('${configType}', '${tabType || ''}')">Start Demo</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+
+        function getInputDialogHtml(configType, config) {
+            if (configType === 'drug_discovery') {
+                return `
+                    <div class="input-section">
+                        <h3>Enter Starting Molecule</h3>
+                        <p>Provide a SMILES string to start the optimization from:</p>
+                        <div class="input-group">
+                            <label for="smilesInput">SMILES String:</label>
+                            <input type="text" id="smilesInput" placeholder="e.g., c1ccccc1 (benzene)" value="c1ccccc1">
+                            <small>Examples: c1ccccc1 (benzene), COc1ccccc1 (anisole), CC(=O)N (acetamide)</small>
+                        </div>
+                    </div>
+                `;
+            } else if (configType === 'fragrance_design') {
+                return `
+                    <div class="input-section">
+                        <h3>Choose Fragrance Type</h3>
+                        <p>Select the type of fragrance profile to design:</p>
+                        <div class="input-group">
+                            <label for="fragranceType">Fragrance Profile:</label>
+                            <select id="fragranceType">
+                                <option value="jasmine">Jasmine - Floral, Sweet, Indolic</option>
+                                <option value="citrus">Citrus - Fresh, Zesty, Bright</option>
+                                <option value="woody">Woody - Warm, Earthy, Masculine</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
             }
+            return '<p>No input required for this demo.</p>';
+        }
+
+        function proceedWithDemo(configType, tabType) {
+            const inputData = getUserInput(configType);
+            if (!inputData) return;
             
-            // Show modal
-            document.getElementById('progressModal').classList.add('active');
-            document.getElementById('modalTitle').textContent = `AI ${config.name}`;
-            document.getElementById('modalSubtitle').textContent = config.description;
+            // Close input modal
+            closeInputModal();
             
-            // Reset UI
-            document.getElementById('progressFill').style.width = '0%';
-            document.getElementById('progressText').textContent = '0% Complete';
-            document.getElementById('reasoningContainer').innerHTML = '';
-            document.getElementById('resultsContainer').style.display = 'none';
+            // Navigate to demo page
+            navigateToDemo(configType, tabType, inputData);
+        }
+
+        function getUserInput(configType) {
+            if (configType === 'drug_discovery') {
+                const smiles = document.getElementById('smilesInput').value.trim();
+                if (!smiles) {
+                    alert('Please enter a SMILES string');
+                    return null;
+                }
+                return { smiles: smiles };
+            } else if (configType === 'fragrance_design') {
+                const fragranceType = document.getElementById('fragranceType').value;
+                return { fragrance_type: fragranceType };
+            }
+            return {};
+        }
+
+        function closeInputModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function navigateToDemo(configType, tabType, inputData) {
+            // Store input data in session storage
+            sessionStorage.setItem('demoInput', JSON.stringify(inputData));
+            sessionStorage.setItem('demoType', configType);
+            sessionStorage.setItem('tabType', tabType || '');
             
-            // Start optimization
-            fetch('/api/start_optimization', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    config_type: configType,
-                    tab_type: tabType,
-                    use_ai: true
-                })
-            }).then(() => {
-                // Start polling for progress updates
-                startProgressPolling();
-            }).catch(console.error);
+            // Navigate to demo page
+            window.location.href = '/demo';
         }
 
         function closeModal() {
@@ -814,6 +1247,11 @@
                 if (!document.getElementById(`step-${lastStep.step}`)) {
                     const stepElement = createReasoningStep(lastStep);
                     container.appendChild(stepElement);
+                    
+                    // Auto-scroll to show the latest step
+                    setTimeout(() => {
+                        scrollToLatestReasoningStep();
+                    }, 100);
                 }
             }
             
@@ -829,8 +1267,13 @@
 
         function createReasoningStep(step) {
             const stepDiv = document.createElement('div');
-            stepDiv.className = 'reasoning-step';
+            stepDiv.className = 'reasoning-step latest';
             stepDiv.id = `step-${step.step}`;
+            
+            // Remove 'latest' class after animation
+            setTimeout(() => {
+                stepDiv.classList.remove('latest');
+            }, 2000);
             
             const statusClass = getStatusClass(step.title);
             
@@ -983,34 +1426,49 @@
                 `;
             }
 
-            // Show generated molecules
+            // Show generated molecules in horizontal carousel
             if (molecules && molecules.length > 0) {
                 resultsHTML += `
-                    <div style="margin-top: 24px;">
-                        <h4 style="margin-bottom: 16px; color: var(--color-accent);">🧬 Generated Molecules</h4>
-                        <div class="molecules-grid">
-                            ${molecules.map(mol => `
-                                <div class="molecule-card">
-                                    <div class="molecule-smiles">${mol.smiles}</div>
-                                    <div class="molecule-description">${mol.description}</div>
-                                    <div class="molecule-score">Score: ${mol.score}</div>
-                                    ${mol.llm_reasoning ? `
-                                        <div class="llm-reasoning">
-                                            <div class="reasoning-header">🤖 AI Reasoning:</div>
-                                            <div class="reasoning-text">${mol.llm_reasoning}</div>
-                                            ${mol.modification_type ? `<div class="modification-type">Type: ${mol.modification_type}</div>` : ''}
-                                            ${mol.chemical_analysis ? `
-                                                <div class="chemical-analysis">
-                                                    ${mol.chemical_analysis.property_change ? `<div class="property-change">${mol.chemical_analysis.property_change}</div>` : ''}
-                                                    ${mol.chemical_analysis.volatility ? `<div class="volatility">Volatility: ${mol.chemical_analysis.volatility}</div>` : ''}
-                                                    ${mol.chemical_analysis.descriptors ? `<div class="descriptors">Descriptors: ${mol.chemical_analysis.descriptors}</div>` : ''}
-                                                    ${mol.chemical_analysis.rationale ? `<div class="rationale">${mol.chemical_analysis.rationale}</div>` : ''}
-                                                </div>
-                                            ` : ''}
+                    <div class="molecules-section">
+                        <div class="molecules-header">
+                            <h4>🧬 Generated Molecules</h4>
+                            <div class="molecule-counter">${molecules.length} candidates</div>
+                        </div>
+                        <div class="molecules-carousel-container">
+                            <div class="molecules-carousel" id="moleculesCarousel">
+                                ${molecules.map((mol, index) => `
+                                    <div class="molecule-card-carousel ${index === 0 ? 'active' : ''}" data-index="${index}">
+                                        <div class="molecule-header">
+                                            <div class="molecule-smiles">${mol.smiles}</div>
+                                            <div class="molecule-score">${mol.score}</div>
                                         </div>
-                                    ` : ''}
+                                        <div class="molecule-description">${mol.description}</div>
+                                        ${mol.llm_reasoning ? `
+                                            <div class="llm-reasoning-compact">
+                                                <div class="reasoning-header">🤖 AI Reasoning</div>
+                                                <div class="reasoning-text">${mol.llm_reasoning}</div>
+                                                ${mol.modification_type ? `<div class="modification-type">${mol.modification_type}</div>` : ''}
+                                                ${mol.chemical_analysis ? `
+                                                    <div class="chemical-analysis-compact">
+                                                        ${mol.chemical_analysis.property_change ? `<div class="property-change">${mol.chemical_analysis.property_change}</div>` : ''}
+                                                        ${mol.chemical_analysis.volatility ? `<div class="volatility">${mol.chemical_analysis.volatility}</div>` : ''}
+                                                        ${mol.chemical_analysis.descriptors ? `<div class="descriptors">${mol.chemical_analysis.descriptors}</div>` : ''}
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn prev-btn" onclick="scrollMolecules(-1)">‹</button>
+                                <div class="carousel-dots">
+                                    ${molecules.map((_, index) => `
+                                        <span class="dot ${index === 0 ? 'active' : ''}" onclick="goToMolecule(${index})"></span>
+                                    `).join('')}
                                 </div>
-                            `).join('')}
+                                <button class="carousel-btn next-btn" onclick="scrollMolecules(1)">›</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1018,12 +1476,99 @@
 
             container.innerHTML = resultsHTML;
             container.style.display = 'block';
+            
+            // Initialize carousel if molecules are present
+            if (molecules && molecules.length > 0) {
+                initializeCarousel(molecules);
+            }
         }
 
-        // Escape key to close modal
+        // Carousel functionality
+        let currentMoleculeIndex = 0;
+        let totalMolecules = 0;
+
+        function scrollMolecules(direction) {
+            const carousel = document.getElementById('moleculesCarousel');
+            if (!carousel) return;
+
+            const cards = carousel.querySelectorAll('.molecule-card-carousel');
+            totalMolecules = cards.length;
+            
+            currentMoleculeIndex += direction;
+            
+            // Handle bounds
+            if (currentMoleculeIndex < 0) currentMoleculeIndex = totalMolecules - 1;
+            if (currentMoleculeIndex >= totalMolecules) currentMoleculeIndex = 0;
+            
+            updateCarousel();
+        }
+
+        function goToMolecule(index) {
+            currentMoleculeIndex = index;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const carousel = document.getElementById('moleculesCarousel');
+            if (!carousel) return;
+
+            const cards = carousel.querySelectorAll('.molecule-card-carousel');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            
+            // Update active card
+            cards.forEach((card, index) => {
+                card.classList.toggle('active', index === currentMoleculeIndex);
+            });
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentMoleculeIndex);
+            });
+            
+            // Update button states
+            if (prevBtn) prevBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
+            
+            // Scroll to active card
+            const cardWidth = 320 + 16; // card width + gap
+            const scrollPosition = currentMoleculeIndex * cardWidth;
+            carousel.style.transform = `translateX(-${scrollPosition}px)`;
+        }
+
+        // Auto-scroll reasoning steps during generation
+        function scrollToLatestReasoningStep() {
+            const container = document.getElementById('reasoningContainer');
+            if (container) {
+                // Smooth scroll to bottom to show the latest step
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Initialize carousel when results are shown (no auto-scroll)
+        function initializeCarousel(molecules) {
+            setTimeout(() => {
+                currentMoleculeIndex = 0;
+                totalMolecules = molecules ? molecules.length : 0;
+                updateCarousel();
+            }, 100);
+        }
+
+
+        // Keyboard navigation
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeModal();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                scrollMolecules(-1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                scrollMolecules(1);
             }
         });
     </script>
