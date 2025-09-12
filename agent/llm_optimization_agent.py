@@ -23,7 +23,7 @@ class LLMOptimizationAgent:
     - Adaptive parameter adjustment
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-5"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1"):
         self.model = model
         self.client = openai.OpenAI(api_key=api_key or openai.api_key)
         self.optimization_history = []

@@ -834,17 +834,21 @@ def run_optimization(
             csv_file = None
 
     # Initialize controller (LLM or heuristic)
+    print(f"🔧 Controller config: use_controller={cfg.use_controller}, use_llm_controller={cfg.use_llm_controller}")
     if cfg.use_controller:
         if cfg.use_llm_controller:
             try:
+                print("🤖 Attempting to initialize LLM controller...")
                 controller = LLMController()
-                print("Using LLM-based controller")
+                print("✅ Using LLM-based controller")
             except Exception as e:
-                print(f"Failed to initialize LLM controller: {e}. Falling back to heuristic controller.")
+                print(f"❌ Failed to initialize LLM controller: {e}. Falling back to heuristic controller.")
                 controller = HeuristicController()
         else:
+            print("🎛️ Using heuristic controller")
             controller = HeuristicController()
     else:
+        print("⚠️ Controller disabled")
         controller = None
     
     # Initialize LLM candidate generator if enabled
@@ -876,7 +880,9 @@ def run_optimization(
                 last_best=last_best,
                 last_avg=last_avg,
             )
+            print(f"🎯 Calling controller.decide() - Controller type: {type(controller).__name__}")
             action: Action = controller.decide(obs)
+            print(f"✅ Controller decided: op={action.op}, k={action.k}, lam={action.lam}")
             # Apply knob overrides with clamping to safe ranges
             def _clamp(v, lo, hi):
                 try:
@@ -916,6 +922,9 @@ def run_optimization(
         # Propose candidates from current pool
         if op == "llm" and llm_candidate_generator is not None:
             # Use LLM-based candidate generation
+            current_best = max(y) if y else 0.0
+            prev_best = 0.0 if r == 0 else max(y) if y else 0.0  
+            improved = current_best > prev_best + 1e-6
             round_info = {
                 "round": r + 1,
                 "progress": "improving" if improved else "stagnating",

@@ -21,7 +21,7 @@ class LLMAgent:
     def __init__(self, 
                  constraints: ChemicalConstraints = None,
                  api_key: Optional[str] = None,
-                 model: str = "gpt-5"):
+                 model: str = "gpt-4.1"):
         """
         Initialize the LLM agent.
         

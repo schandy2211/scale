@@ -3,6 +3,7 @@ LLM-based molecular candidate generator that replaces heuristic BRICS/attach ope
 """
 
 import json
+import os
 import random
 import warnings
 from typing import List, Optional, Tuple, Dict, Any
@@ -17,9 +18,18 @@ warnings.filterwarnings("ignore", category=DeprecationWarning, module="rdkit")
 class LLMCandidateGenerator:
     """LLM-based candidate generator that uses GPT to intelligently propose molecular modifications."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-5"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1"):
         self.model = model
-        self.client = openai.OpenAI(api_key=api_key or openai.api_key)
+        
+        # Set up OpenAI client - use same pattern as controller
+        if api_key:
+            openai.api_key = api_key
+        elif os.getenv("OPENAI_API_KEY"):
+            openai.api_key = os.getenv("OPENAI_API_KEY")
+        else:
+            raise ValueError("OpenAI API key must be provided or set in OPENAI_API_KEY environment variable")
+        
+        print(f"🎯 LLM Candidate Generator initialized with model: {self.model}")
         
         # Fallback fragment library for when LLM fails
         self.fallback_frags = [
@@ -149,7 +159,9 @@ class LLMCandidateGenerator:
         )
         
         try:
-            response = self.client.chat.completions.create(
+            print(f"🔧 Sending request to {self.model} with prompt length: {len(prompt)}")
+            print(f"📤 Prompt preview: '{prompt[:300]}...'")
+            response = openai.chat.completions.create(
                 model=self.model,
                 messages=[
                     {
@@ -161,11 +173,21 @@ class LLMCandidateGenerator:
                 max_completion_tokens=2000
             )
             
-            response_text = response.choices[0].message.content.strip()
+            response_text = response.choices[0].message.content
+            print(f"🧬 LLM Candidate Generator Raw Response: {repr(response_text)}")
+            print(f"📏 Response length: {len(response_text) if response_text else 0}")
+            
+            if response_text:
+                response_text = response_text.strip()
+                print(f"🧪 LLM Candidate Generator Cleaned Response: '{response_text[:200]}...' (showing first 200 chars)")
+            else:
+                print("⚠️ LLM returned None or empty response")
+            
             return self._parse_llm_response(response_text)
             
         except Exception as e:
-            print(f"LLM API error in candidate generation: {e}")
+            print(f"❌ LLM API error in candidate generation: {e}")
+            print(f"🔍 Exception type: {type(e).__name__}")
             return []
     
     def _create_generation_prompt(
@@ -179,7 +201,9 @@ class LLMCandidateGenerator:
     ) -> str:
         """Create a detailed prompt for candidate generation."""
         
-        context = f"""Generate {n_candidates} novel molecular candidates for optimization.
+        # Cap the request to a reasonable size for LLM
+        request_size = min(n_candidates, 20)  # Ask for max 20 candidates per LLM call
+        context = f"""Generate {request_size} novel molecular candidates for optimization.
 
 OBJECTIVE: {objective.upper()}
 CURRENT BEST SCORE: {current_best:.3f}
@@ -227,6 +251,7 @@ RESPONSE FORMAT:
     def _parse_llm_response(self, response_text: str) -> List[Chem.Mol]:
         """Parse LLM response and convert to molecules."""
         molecules = []
+        print(f"🔬 Parsing candidate generator response...")
         
         try:
             # Try to extract JSON from response
@@ -234,15 +259,19 @@ RESPONSE FORMAT:
                 json_start = response_text.find("```json") + 7
                 json_end = response_text.find("```", json_start)
                 json_text = response_text[json_start:json_end].strip()
+                print(f"📄 Extracted JSON from code block")
             elif "{" in response_text and "}" in response_text:
                 json_start = response_text.find("{")
                 json_end = response_text.rfind("}") + 1
                 json_text = response_text[json_start:json_end]
+                print(f"📄 Extracted JSON from braces")
             else:
                 # Try to parse the entire response as JSON
                 json_text = response_text
+                print(f"📄 Using entire response as JSON")
             
             data = json.loads(json_text)
+            print(f"✅ Successfully parsed candidate JSON with {len(data.get('candidates', []))} candidates")
             candidates = data.get("candidates", [])
             
             for candidate in candidates:
