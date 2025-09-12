@@ -3,6 +3,7 @@
 **AI-Powered Molecular Optimization with LLM Intelligence and Chemosensory Focus**
 
 SCALE is a fast, agentic molecular optimizer that designs small molecules under guardrails. It now features **LLM-powered controllers** and **chemosensory optimization** for flavor/fragrance applications.
+**Perfect for:** Drug discovery, fragrance design, chemistry research, AI agent experiments
 
 ## ✨ What Makes This Special?
 
