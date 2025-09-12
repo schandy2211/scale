@@ -63,7 +63,10 @@ class LLMController:
             )
             
             # Parse LLM response
-            response_text = response.choices[0].message.content.strip()
+            response_text = response.choices[0].message.content
+            
+            if response_text:
+                response_text = response_text.strip()
             
             # If empty response, use fallback immediately
             if not response_text:
@@ -89,35 +92,20 @@ class LLMController:
         else:
             self._stagnation_count = getattr(self, '_stagnation_count', 0) + 1
         
-        prompt = f"""You are an expert molecular optimization controller. Analyze the current state and recommend optimal parameters.
+        prompt = f"""Molecular optimization controller. Round {obs.round_index}/{obs.rounds_total}.
 
-OPTIMIZATION STATE:
-- Round: {obs.round_index}/{obs.rounds_total}
-- Current Best Score: {obs.best:.4f}
-- Previous Best: {obs.last_best:.4f}
-- Improvement: {'Yes' if improved else 'No'} ({progress_rate:+.1%})
-- Stagnation Rounds: {stagnation_rounds}
-- Training Set Size: {obs.train_size}
-- Average Score: {obs.avg:.4f}
+Current best score: {obs.best:.3f}
+Improved this round: {'Yes' if improved else 'No'}
 
-CONTROL PARAMETERS TO OPTIMIZE:
-- op: Operation type ("brics" for fragment-based, "attach" for simple attachment, "llm" for LLM-based generation)
-- k: Exploration factor (0.5-2.0, higher = more exploration)
-- div: Diversity penalty (0.0-0.5, higher = more diverse molecules)
-- lam: Strain penalty scaling (0.5-2.0, higher = more strain penalty)
-- sa_beta: Synthetic accessibility penalty (0.0-0.3, higher = penalize complex molecules)
-- scaf_alpha: Scaffold diversity penalty (0.0-0.5, higher = encourage scaffold diversity)
+Return JSON parameters:
+{{"op": "brics", "k": 1.0, "div": 0.2, "lam": 1.0, "sa_beta": 0.0, "scaf_alpha": 0.0}}
 
-STRATEGY GUIDELINES:
-- If stagnating (no improvement for 2+ rounds): increase exploration (k=1.5), try different operation
-- If improving well: maintain current strategy, slight exploration increase
-- If early rounds: focus on exploration and diversity
-- If late rounds: focus on exploitation and refinement
-- For QED optimization: prioritize drug-likeness and synthetic accessibility
-- For pen_logp optimization: balance lipophilicity with other properties
+Guidelines:
+- If not improving: increase k (exploration) to 1.5, try "attach" operation
+- If improving: keep k around 1.0, use "brics" operation
+- div = diversity (0.0-0.5), lam = strain penalty (0.5-2.0)
 
-Return JSON with your recommendations:
-{{"op": "brics", "k": 1.2, "div": 0.25, "lam": 1.0, "sa_beta": 0.1, "scaf_alpha": 0.2}}"""
+Return only valid JSON:"""
         return prompt
     
     def _parse_response(self, response_text: str, obs: Observation) -> Action:
