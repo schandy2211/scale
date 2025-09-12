@@ -32,6 +32,7 @@ if _ROOT not in _sys.path:
 
 from agent.controller import HeuristicController, Observation, Action
 from agent.llm_controller import LLMController
+from agent.llm_candidate_generator import LLMCandidateGenerator
 try:
     # Preferred modern fingerprint API (avoids deprecation warnings)
     from rdkit.Chem import rdFingerprintGenerator as _rdFG  # type: ignore
@@ -672,6 +673,7 @@ class OptConfig:
     log_csv: Optional[str] = None       # write per-round selections to CSV if set
     use_controller: bool = False        # enable agentic controller
     use_llm_controller: bool = False    # use LLM-based controller instead of heuristic
+    use_llm_candidates: bool = False    # use LLM-based candidate generation
     scaffold_cap_per_round: Optional[int] = None  # hard cap per Murcko scaffold among selected
     # Composite objective training (align model to realism):
     # if True, train RF on eff = QED - sa_soft_beta*SA - lambda_strain*strain
@@ -836,6 +838,7 @@ def run_optimization(
         if cfg.use_llm_controller:
             try:
                 controller = LLMController()
+                print("Using LLM-based controller")
             except Exception as e:
                 print(f"Failed to initialize LLM controller: {e}. Falling back to heuristic controller.")
                 controller = HeuristicController()
@@ -843,6 +846,16 @@ def run_optimization(
             controller = HeuristicController()
     else:
         controller = None
+    
+    # Initialize LLM candidate generator if enabled
+    llm_candidate_generator = None
+    if cfg.use_llm_candidates:
+        try:
+            llm_candidate_generator = LLMCandidateGenerator()
+            print("Using LLM-based candidate generation")
+        except Exception as e:
+            print(f"Failed to initialize LLM candidate generator: {e}. Using heuristic methods.")
+            llm_candidate_generator = None
     decisions: List[Dict[str, object]] = []
 
     for r in range(cfg.rounds):
@@ -901,7 +914,21 @@ def run_optimization(
             op = "brics"
 
         # Propose candidates from current pool
-        if op == "attach":
+        if op == "llm" and llm_candidate_generator is not None:
+            # Use LLM-based candidate generation
+            round_info = {
+                "round": r + 1,
+                "progress": "improving" if improved else "stagnating",
+                "strategy": "llm_generation"
+            }
+            cand_mols = llm_candidate_generator.generate_candidates(
+                seed_mols=train_mols,
+                n_candidates=local_cands,
+                objective=cfg.objective,
+                current_best=max(y) if y else 0.0,
+                round_info=round_info
+            )
+        elif op == "attach":
             cand_mols = simple_attach_candidates(
                 seed_mols=train_mols,
                 n_candidates=local_cands,
@@ -1258,6 +1285,7 @@ if __name__ == "__main__":
     parser.add_argument("--csv", dest="csv", default="", help="CSV path to log per-round selections")
     parser.add_argument("--agent", action="store_true", help="Enable agentic controller (heuristic)")
     parser.add_argument("--llm", action="store_true", help="Use LLM-based controller (requires OPENAI_API_KEY)")
+    parser.add_argument("--llm-candidates", action="store_true", help="Use LLM-based candidate generation (requires OPENAI_API_KEY)")
     parser.add_argument("--history_json", default="", help="Path to save history JSON (best/avg/n_train)")
     parser.add_argument("--decisions_json", default="", help="Path to save per-round decisions JSON")
     parser.add_argument("--top_json", default="", help="Path to save final top list JSON")
@@ -1286,6 +1314,7 @@ if __name__ == "__main__":
         log_csv=(args.csv if args.csv else None),
         use_controller=args.agent or args.llm,
         use_llm_controller=args.llm,
+        use_llm_candidates=args.llm_candidates,
         scaffold_cap_per_round=(None if args.scaffold_cap is None or args.scaffold_cap < 0 else args.scaffold_cap),
         audit_k=args.audit_k,
         preserve_seed_scaffold=args.preserve_scaffold,

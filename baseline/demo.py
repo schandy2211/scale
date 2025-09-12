@@ -41,6 +41,7 @@ def main():
     ap.add_argument("--seed_file", default="", help="Path to a file with one SMILES per line (overrides preset)")
     ap.add_argument("--physchem", action="store_true", help="Enable physchem descriptors in surrogate features")
     ap.add_argument("--llm", action="store_true", help="Use LLM-based controller (requires OPENAI_API_KEY)")
+    ap.add_argument("--llm-candidates", action="store_true", help="Use LLM-based candidate generation (requires OPENAI_API_KEY)")
     args = ap.parse_args()
 
     print("SCALE — Scaffold-Conscious Agent for Learning & Exploration")
@@ -68,6 +69,7 @@ def main():
             log_csv=os.path.join(run_dir, "selections.csv"),
             use_controller=True,
             use_llm_controller=args.llm,
+            use_llm_candidates=args.llm_candidates,
             use_physchem=args.physchem,
             train_on_composite=True,
         )
@@ -88,6 +90,7 @@ def main():
             log_csv=os.path.join(run_dir, "selections.csv"),
             use_controller=True,
             use_llm_controller=args.llm,
+            use_llm_candidates=args.llm_candidates,
             use_physchem=args.physchem,
             train_on_composite=False,
         )

@@ -1,6 +1,6 @@
 # LLM Integration for SCALE
 
-This document describes how to use the newly added LLM-based controllers and agents in SCALE.
+This document describes how to use the comprehensive LLM-based optimization system in SCALE that replaces all heuristic components.
 
 ## Quick Start
 
@@ -13,26 +13,34 @@ This document describes how to use the newly added LLM-based controllers and age
    export OPENAI_API_KEY=your_api_key_here
    ```
 
-2. **Run with LLM Controller:**
+2. **Run with Full LLM System:**
    ```bash
-   # Demo with LLM controller
-   python baseline/demo.py --llm
+   # Demo with complete LLM system
+   python baseline/demo.py --llm --llm-candidates
    
-   # Full optimization with LLM controller
-   python baseline/baseline_opt.py --llm --agent --seed "c1ccccc1" --rounds 6
+   # Full optimization with LLM controller and candidate generation
+   python baseline/baseline_opt.py --llm --llm-candidates --agent --seed "c1ccccc1" --rounds 6
    ```
 
 ## What's New
 
 ### LLM Controller (`agent/llm_controller.py`)
-- Replaces the heuristic controller with GPT-based decision making
-- Analyzes optimization progress and adjusts parameters intelligently
-- Falls back to heuristic rules if LLM fails
+- **Enhanced Decision Making**: Analyzes optimization progress with comprehensive context
+- **Adaptive Parameters**: Intelligently adjusts exploration, diversity, and penalty parameters
+- **Strategic Reasoning**: Considers stagnation, progress rate, and optimization phase
+- **Fallback Safety**: Falls back to heuristic rules if LLM fails
 
-### LLM Agent (`agent/llm_agent.py`)
-- Uses GPT to propose molecular modifications
-- Provides chemical reasoning for changes
-- Validates proposed molecules with chemical constraints
+### LLM Candidate Generator (`agent/llm_candidate_generator.py`)
+- **Intelligent Generation**: Uses GPT to propose chemically valid molecular modifications
+- **Context-Aware**: Considers current optimization state, objective, and molecular properties
+- **Multi-Strategy**: Combines LLM reasoning with BRICS and attachment fallbacks
+- **Property Optimization**: Focuses on improving specific molecular properties
+
+### LLM Optimization Agent (`agent/llm_optimization_agent.py`)
+- **Comprehensive Analysis**: Analyzes molecular patterns, limitations, and improvement areas
+- **Strategic Modifications**: Proposes targeted modifications based on chemical reasoning
+- **Multi-Objective**: Handles complex optimization objectives with chemical constraints
+- **Adaptive Strategies**: Adjusts modification strategies based on optimization progress
 
 ## Usage Examples
 
@@ -41,10 +49,15 @@ This document describes how to use the newly added LLM-based controllers and age
 python baseline/demo.py --llm --preset qed_sa --rounds 4
 ```
 
-### Custom Optimization with LLM
+### Full LLM System (Controller + Candidate Generation)
+```bash
+python baseline/demo.py --llm --llm-candidates --preset qed_sa --rounds 4
+```
+
+### Custom Optimization with Complete LLM System
 ```bash
 python baseline/baseline_opt.py \
-  --llm --agent \
+  --llm --llm-candidates --agent \
   --seed "c1ccccc1,c1ccncc1" \
   --objective qed \
   --rounds 6 \
@@ -52,13 +65,19 @@ python baseline/baseline_opt.py \
   --topk 60
 ```
 
-### Compare Heuristic vs LLM
+### Compare Different Approaches
 ```bash
-# Heuristic controller
+# Heuristic system (original)
 python baseline/demo.py --preset qed_sa --rounds 4
 
-# LLM controller  
+# LLM controller only
 python baseline/demo.py --llm --preset qed_sa --rounds 4
+
+# LLM candidate generation only
+python baseline/demo.py --llm-candidates --preset qed_sa --rounds 4
+
+# Complete LLM system
+python baseline/demo.py --llm --llm-candidates --preset qed_sa --rounds 4
 ```
 
 ## Configuration
@@ -69,14 +88,39 @@ python baseline/demo.py --llm --preset qed_sa --rounds 4
 
 ### Command Line Options
 - `--llm`: Use LLM-based controller instead of heuristic
+- `--llm-candidates`: Use LLM-based candidate generation instead of BRICS/attach
 - `--agent`: Enable agentic controller (works with both heuristic and LLM)
 
 ## How It Works
 
 ### LLM Controller Decision Process
-1. Observes current optimization state (scores, progress, round info)
-2. Sends structured prompt to GPT with optimization context
-3. GPT responds with JSON containing parameter recommendations
+1. **State Analysis**: Observes current optimization state (scores, progress, round info, stagnation)
+2. **Context Building**: Creates comprehensive prompt with optimization history and chemical context
+3. **Strategic Reasoning**: GPT analyzes state and recommends optimal parameters
+4. **Parameter Adjustment**: Adjusts exploration, diversity, penalties, and operation type
+5. **Fallback Safety**: Falls back to heuristic rules if LLM fails
+
+### LLM Candidate Generation Process
+1. **Molecular Analysis**: Analyzes current molecules and their properties
+2. **Strategy Generation**: GPT proposes modification strategies based on optimization context
+3. **Candidate Creation**: Generates chemically valid molecular modifications
+4. **Validation**: Filters candidates for chemical validity and drug-likeness
+5. **Fallback Methods**: Uses BRICS/attach methods if LLM generation fails
+
+### Complete LLM System Architecture
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│   LLM Controller│───▶│  Optimization    │───▶│ LLM Candidate       │
+│                 │    │     Loop         │    │ Generator           │
+│ - Parameter     │    │                  │    │                     │
+│   Adjustment    │    │ - Training       │    │ - Molecular         │
+│ - Strategy      │    │ - Prediction     │    │   Analysis          │
+│   Selection     │    │ - Selection      │    │ - Modification      │
+└─────────────────┘    └──────────────────┘    │   Strategies        │
+                                               │ - Chemical          │
+                                               │   Validation        │
+                                               └─────────────────────┘
+```
 4. System parses and applies the recommendations
 5. Falls back to heuristic rules if LLM fails
 
