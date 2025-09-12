@@ -74,7 +74,7 @@ python app.py
 **For quick testing and development:**
 ```bash
 # Find drug-like molecules
-python baseline/demo.py --preset qed_sa --rounds 5
+python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 5
 
 # Find fragrance molecules with AI
 python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
