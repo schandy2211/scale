@@ -13,3 +13,4 @@ dependencies:
   - pip:
       - openai
       - joblib
+      - Flask==2.3.3

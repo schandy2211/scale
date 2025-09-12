@@ -17,8 +17,8 @@ The demo will automatically:
 
 ### **Option 2: Manual Launch**
 ```bash
-# Install Flask dependencies
-pip install Flask==2.3.3
+# Install all dependencies (includes Flask)
+pip install -r requirements.txt
 
 # Navigate to webapp directory
 cd webapp
@@ -34,7 +34,7 @@ python app.py
 
 ### **Troubleshooting:**
 - **Port 8080 in use**: The launcher automatically handles port conflicts
-- **Flask not found**: Run `pip install Flask==2.3.3` first
+- **Flask not found**: Run `pip install -r requirements.txt` first
 - **Browser not opening**: Manually navigate to `http://localhost:8080`
 - **Demo not loading**: Check terminal for error messages and ensure all dependencies are installed
 - **Permission denied**: Make sure you're in the correct directory and have proper permissions

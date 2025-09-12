@@ -15,7 +15,6 @@ def install_requirements():
     """Install Flask requirements if needed."""
     try:
         import flask
-        import flask_socketio
         print("✅ Flask dependencies already installed")
         return True
     except ImportError:
@@ -23,8 +22,7 @@ def install_requirements():
         try:
             subprocess.check_call([
                 sys.executable, "-m", "pip", "install", 
-                "Flask==2.3.3", "Flask-SocketIO==5.3.6", 
-                "python-socketio==5.8.0", "eventlet==0.33.3"
+                "Flask==2.3.3"
             ])
             print("✅ Dependencies installed successfully")
             return True

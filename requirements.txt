@@ -6,3 +6,4 @@ matplotlib
 tqdm
 openai
 joblib
+Flask==2.3.3
