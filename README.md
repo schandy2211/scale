@@ -32,28 +32,27 @@ pip install -r requirements.txt
 
 ## 🚀 Quick Start
 
-### **🎯 Step 1: Choose Your Goal**
+### **🌐 Web Demo (Recommended)**
+**The agentic chemist in your browser. Explores, evaluates, and evolves with diversity and safety by design:**
+```bash
+python launch_demo.py
+```
+Opens interactive web demo at `http://localhost:8080` with:
+- **💊 Drug Discovery**: Design molecules that make it to lab
+- **🧪 Fragrance Design**: Odorant optimization with volatility & safety  
+- **🎭 Mixture Optimization**: Turn intent into candidates that stick ⭐
+
+### **⚡ Command Line**
+**For quick testing and development:**
 ```bash
 # Find drug-like molecules
 python baseline/demo.py --preset qed_sa --rounds 5
 
-# Find fragrance/flavor molecules  
-python baseline/demo.py --preset odor --rounds 5
+# Find fragrance molecules with AI
+python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
 ```
 
-### **🤖 Step 2: Add AI Power (Optional)**
-```bash
-# Let AI make optimization decisions
-python baseline/demo.py --preset qed_sa --llm --rounds 5
-
-# Let AI design new molecules
-python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 5
-
-# Use different AI models
-python baseline/demo.py --preset qed_sa --llm --model gpt-4o --rounds 5
-```
-
-**That's it!** Results are saved in `runs/` folder with plots and molecule data.
+**Results** are saved in `runs/` folder with plots and molecule data.
 
 ## 📚 Simple Concepts
 

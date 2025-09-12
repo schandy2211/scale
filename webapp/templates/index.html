@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCALE - AI Molecular Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Cursor-inspired design system */
+        :root {
+            --color-bg: #0a0a0a;
+            --color-bg-secondary: #111111;
+            --color-bg-tertiary: #1a1a1a;
+            --color-text-primary: #ffffff;
+            --color-text-secondary: #a0a0a0;
+            --color-text-muted: #666666;
+            --color-accent: #646cff;
+            --color-accent-hover: #535bf2;
+            --color-success: #22c55e;
+            --color-warning: #eab308;
+            --color-error: #ef4444;
+            --color-purple: #8b5cf6;
+            --color-blue: #3b82f6;
+            --color-green: #10b981;
+            --border-radius: 12px;
+            --border-radius-large: 16px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid #222;
+            padding: var(--spacing-md) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .tagline {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-xxl) 0;
+            text-align: center;
+            background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--color-text-primary), var(--color-text-secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Demo Cards */
+        .demo-section {
+            padding: var(--spacing-xxl) 0;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .demo-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid #222;
+            border-radius: var(--border-radius-large);
+            padding: var(--spacing-xl);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card:hover {
+            border-color: #444;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .demo-card.blue:hover { border-color: #4a5568; }
+        .demo-card.purple:hover { border-color: #6b46c1; }
+        .demo-card.green:hover { border-color: #059669; }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+            display: block;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .card-description {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.5;
+        }
+
+        .card-button {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid #333;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .card-button:hover {
+            background: var(--color-bg-secondary);
+            border-color: var(--color-text-secondary);
+            transform: translateY(-1px);
+        }
+
+        .demo-card.blue .card-button:hover { border-color: #4a5568; }
+        .demo-card.purple .card-button:hover { border-color: #6b46c1; }
+        .demo-card.green .card-button:hover { border-color: #059669; }
+
+        /* Progress Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-bg-secondary);
+            border: 1px solid #333;
+            border-radius: var(--border-radius-large);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: var(--spacing-xl);
+            position: relative;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .modal-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: var(--spacing-lg) 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--color-bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-accent), var(--color-purple));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        /* AI Reasoning Steps */
+        .reasoning-container {
+            margin-top: var(--spacing-lg);
+        }
+
+        .reasoning-step {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border-left: 4px solid var(--color-accent);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .step-number {
+            background: var(--color-accent);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .step-time {
+            color: var(--color-text-muted);
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .step-description {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .step-details {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        /* Results */
+        .results-container {
+            margin-top: var(--spacing-lg);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-success);
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--color-success);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .achievement-text {
+            color: var(--color-text-secondary);
+            font-size: 18px;
+        }
+
+        .molecules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .molecule-card {
+            background: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            border: 1px solid #333;
+        }
+
+        .molecule-smiles {
+            font-family: 'Courier New', monospace;
+            background: var(--color-bg);
+            padding: var(--spacing-sm);
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: var(--spacing-sm);
+            word-break: break-all;
+        }
+
+        .molecule-description {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .molecule-score {
+            color: var(--color-success);
+            font-weight: 600;
+        }
+
+        /* Blend Formula */
+        .blend-container {
+            margin-top: var(--spacing-lg);
+        }
+
+        .blend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .blend-percentage {
+            color: var(--color-accent);
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        /* Close button */
+        .close-button {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .close-button:hover {
+            color: var(--color-text-primary);
+            background: var(--color-bg-tertiary);
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: var(--spacing-xs);
+        }
+
+        .status-indicator.thinking {
+            background: var(--color-warning);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.generating {
+            background: var(--color-accent);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.completed {
+            background: var(--color-success);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: var(--spacing-md);
+                width: calc(100% - 32px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🧪</div>
+                    <div>
+                        <div>SCALE</div>
+                        <div class="tagline">AI Molecular Design</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>The AI Molecular Designer</h1>
+            <p>From idea to molecule, fast. LLM reasoning + physics + guardrails for synthesis‑ready candidates.</p>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <div class="demo-grid">
+                {% for key, config in configs.items() %}
+                <div class="demo-card {{ config.color }}" onclick="startDemo('{{ key }}')">
+                    <span class="card-icon">{{ config.icon }}</span>
+                    <h3 class="card-title">{{ config.name }}</h3>
+                    <p class="card-description">{{ config.description }}</p>
+                    <button class="card-button">Start Demo</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Modal -->
+    <div class="modal" id="progressModal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModal()">&times;</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">AI Molecular Design</h2>
+                <p class="modal-subtitle" id="modalSubtitle">Initializing...</p>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% Complete</div>
+            </div>
+
+            <div class="reasoning-container" id="reasoningContainer">
+                <!-- AI reasoning steps will appear here -->
+            </div>
+
+            <div class="results-container" id="resultsContainer" style="display: none;">
+                <!-- Results will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Polling-based progress updates
+        let currentDemo = null;
+        let progressInterval = null;
+
+        // Demo configuration
+        const demoConfigs = {{ configs | tojson }};
+
+        function startDemo(configType) {
+            currentDemo = configType;
+            const config = demoConfigs[configType];
+            
+            // Show modal
+            document.getElementById('progressModal').classList.add('active');
+            document.getElementById('modalTitle').textContent = `AI ${config.name}`;
+            document.getElementById('modalSubtitle').textContent = config.description;
+            
+            // Reset UI
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '0% Complete';
+            document.getElementById('reasoningContainer').innerHTML = '';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            // Start optimization
+            fetch('/api/start_optimization', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    config_type: configType,
+                    use_ai: true
+                })
+            }).then(() => {
+                // Start polling for progress updates
+                startProgressPolling();
+            }).catch(console.error);
+        }
+
+        function closeModal() {
+            document.getElementById('progressModal').classList.remove('active');
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        function startProgressPolling() {
+            progressInterval = setInterval(() => {
+                fetch('/api/status')
+                    .then(response => response.json())
+                    .then(data => updateProgress(data))
+                    .catch(console.error);
+            }, 1000); // Poll every second
+        }
+
+        function updateProgress(data) {
+            // Update progress bar
+            document.getElementById('progressFill').style.width = data.progress + '%';
+            document.getElementById('progressText').textContent = data.progress + '% Complete';
+            
+            // Add new reasoning steps
+            if (data.ai_reasoning && data.ai_reasoning.length > 0) {
+                const container = document.getElementById('reasoningContainer');
+                const lastStep = data.ai_reasoning[data.ai_reasoning.length - 1];
+                
+                // Check if this step is already displayed
+                if (!document.getElementById(`step-${lastStep.step}`)) {
+                    const stepElement = createReasoningStep(lastStep);
+                    container.appendChild(stepElement);
+                }
+            }
+            
+            // Show results if completed
+            if (data.status === 'completed' && data.results) {
+                showResults(data.results, data.molecules_generated);
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                }
+            }
+        }
+
+        function createReasoningStep(step) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'reasoning-step';
+            stepDiv.id = `step-${step.step}`;
+            
+            const statusClass = getStatusClass(step.title);
+            
+            stepDiv.innerHTML = `
+                <div class="step-header">
+                    <div class="step-number">${step.step}</div>
+                    <div class="step-title">
+                        <span class="status-indicator ${statusClass}"></span>
+                        ${step.title}
+                    </div>
+                    <div class="step-time">${step.time}</div>
+                </div>
+                <div class="step-description">${step.description}</div>
+                ${step.details ? `<div class="step-details">${step.details}</div>` : ''}
+            `;
+            
+            return stepDiv;
+        }
+
+        function getStatusClass(title) {
+            if (title.includes('Analyzing') || title.includes('thinking')) return 'thinking';
+            if (title.includes('Generating') || title.includes('Optimizing')) return 'generating';
+            if (title.includes('Complete') || title.includes('Achievement')) return 'completed';
+            return 'thinking';
+        }
+
+        function showResults(results, molecules) {
+            const container = document.getElementById('resultsContainer');
+            
+            let resultsHTML = `
+                <div class="results-header">
+                    <div class="score-display">${results.final_score}</div>
+                    <div class="achievement-text">${results.achievement}</div>
+                    <p style="color: var(--color-text-muted); margin-top: 8px;">${results.innovation}</p>
+                </div>
+            `;
+
+            // Show blend formula for mixture optimization
+            if (results.blend_formula) {
+                resultsHTML += `
+                    <div class="blend-container">
+                        <h4 style="margin-bottom: 16px; color: var(--color-accent);">🎭 Optimal Blend Formula</h4>
+                        ${results.blend_formula.map(item => `
+                            <div class="blend-item">
+                                <div>
+                                    <div style="font-weight: 600;">${item.molecule}</div>
+                                    <div style="font-family: monospace; font-size: 12px; color: var(--color-text-muted);">${item.smiles}</div>
+                                </div>
+                                <div class="blend-percentage">${item.percentage}%</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Show generated molecules
+            if (molecules && molecules.length > 0) {
+                resultsHTML += `
+                    <div style="margin-top: 24px;">
+                        <h4 style="margin-bottom: 16px; color: var(--color-accent);">🧬 Generated Molecules</h4>
+                        <div class="molecules-grid">
+                            ${molecules.map(mol => `
+                                <div class="molecule-card">
+                                    <div class="molecule-smiles">${mol.smiles}</div>
+                                    <div class="molecule-description">${mol.description}</div>
+                                    <div class="molecule-score">Score: ${mol.score}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = resultsHTML;
+            container.style.display = 'block';
+        }
+
+        // Escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
