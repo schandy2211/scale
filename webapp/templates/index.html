@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>SCALE - AI Molecular Design</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -121,9 +124,26 @@
             margin-right: auto;
         }
 
+        .hero-tagline {
+            font-size: 28px !important;
+            color: #d97706 !important;
+            font-weight: 600 !important;
+            margin-bottom: var(--spacing-sm) !important;
+        }
+
         /* Demo Cards */
         .demo-section {
             padding: var(--spacing-xxl) 0;
+        }
+
+        .demo-description {
+            text-align: center;
+            font-size: 18px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .demo-grid {
@@ -193,6 +213,37 @@
         .demo-card.blue .card-button:hover { border-color: #4a5568; }
         .demo-card.purple .card-button:hover { border-color: #6b46c1; }
         .demo-card.green .card-button:hover { border-color: #059669; }
+
+        /* Card Tabs */
+        .card-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-md);
+        }
+
+        .tab-button {
+            flex: 1;
+            background: var(--color-bg-tertiary);
+            border: 1px solid #333;
+            color: var(--color-text-secondary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: var(--color-bg-secondary);
+            border-color: var(--color-text-secondary);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+
+        .demo-card.blue .tab-button:hover { border-color: #4a5568; }
+        .demo-card.purple .tab-button:hover { border-color: #6b46c1; }
+        .demo-card.green .tab-button:hover { border-color: #059669; }
 
         /* Progress Modal */
         .modal {
@@ -331,6 +382,54 @@
             color: var(--color-text-muted);
             font-size: 14px;
             font-style: italic;
+        }
+
+        /* Chemical Reasoning */
+        .chemical-reasoning {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--border-radius);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .chemical-reasoning h4 {
+            color: #3b82f6;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 var(--spacing-sm) 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .reasoning-section {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .reasoning-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .reasoning-section strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .reasoning-section ul {
+            margin: var(--spacing-xs) 0 0 var(--spacing-md);
+            padding: 0;
+        }
+
+        .reasoning-section li {
+            margin-bottom: var(--spacing-xs);
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .reasoning-section li strong {
+            color: #3b82f6;
+            font-weight: 500;
         }
 
         /* Results */
@@ -494,20 +593,32 @@
     <section class="hero">
         <div class="container">
             <h1>The AI Molecular Designer</h1>
-            <p>From idea to molecule, fast. LLM reasoning + physics + guardrails for synthesis‑ready candidates.</p>
+            <p class="hero-tagline">Idea to custom molecules, fast!</p>
         </div>
     </section>
 
     <!-- Demo Section -->
     <section class="demo-section">
         <div class="container">
+            <p class="demo-description">Evolve molecules toward specific objectives with AI agentic experimentation and reasoning + physics + guardrails for synthesis ready candidates.</p>
             <div class="demo-grid">
                 {% for key, config in configs.items() %}
-                <div class="demo-card {{ config.color }}" onclick="startDemo('{{ key }}')">
+                <div class="demo-card {{ config.color }}">
                     <span class="card-icon">{{ config.icon }}</span>
                     <h3 class="card-title">{{ config.name }}</h3>
                     <p class="card-description">{{ config.description }}</p>
-                    <button class="card-button">Start Demo</button>
+                    
+                    {% if config.tabs %}
+                        <div class="card-tabs">
+                            {% for tab_key, tab_config in config.tabs.items() %}
+                            <button class="tab-button" onclick="startDemo('{{ key }}', '{{ tab_key }}')">
+                                {{ tab_config.name }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <button class="card-button" onclick="startDemo('{{ key }}')">Start Demo</button>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -549,9 +660,17 @@
         // Demo configuration
         const demoConfigs = {{ configs | tojson }};
 
-        function startDemo(configType) {
+        function startDemo(configType, tabType = null) {
             currentDemo = configType;
-            const config = demoConfigs[configType];
+            let config = demoConfigs[configType];
+            
+            // If there's a tab, use the tab config instead
+            if (tabType && config.tabs) {
+                config = config.tabs[tabType];
+                // Add the tab type to the config for backend processing
+                config.tabType = tabType;
+                config.parentType = configType;
+            }
             
             // Show modal
             document.getElementById('progressModal').classList.add('active');
@@ -572,6 +691,7 @@
                 },
                 body: JSON.stringify({
                     config_type: configType,
+                    tab_type: tabType,
                     use_ai: true
                 })
             }).then(() => {
@@ -590,7 +710,7 @@
 
         function startProgressPolling() {
             progressInterval = setInterval(() => {
-                fetch('/api/status')
+                fetch('/api/status?' + Date.now())
                     .then(response => response.json())
                     .then(data => updateProgress(data))
                     .catch(console.error);
@@ -631,6 +751,81 @@
             
             const statusClass = getStatusClass(step.title);
             
+            // Build chemical reasoning HTML if present
+            let chemicalReasoningHTML = '';
+            if (step.chemical_reasoning) {
+                chemicalReasoningHTML = '<div class="chemical-reasoning"><h4>🧪 Chemical Analysis</h4>';
+                
+                // Handle different types of chemical reasoning
+                if (step.chemical_reasoning.target_notes) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Target Notes:</strong> ' + 
+                        step.chemical_reasoning.target_notes.join(', ') + '</div>';
+                }
+                
+                if (step.chemical_reasoning.key_functional_groups) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Key Functional Groups:</strong> ' + 
+                        step.chemical_reasoning.key_functional_groups.join(', ') + '</div>';
+                }
+                
+                if (step.chemical_reasoning.molecular_requirements) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Molecular Requirements:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.molecular_requirements)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.scaffold_analysis) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Scaffold Analysis:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.scaffold_analysis)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.functional_group_strategy) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Functional Group Strategy:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.functional_group_strategy)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.mixture_strategy) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Mixture Strategy:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.mixture_strategy)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.synergistic_effects) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Synergistic Effects:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.synergistic_effects)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.objective_analysis) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Objective Analysis:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.objective_analysis)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                if (step.chemical_reasoning.modification_strategy) {
+                    chemicalReasoningHTML += '<div class="reasoning-section"><strong>Modification Strategy:</strong><ul>';
+                    for (const [key, value] of Object.entries(step.chemical_reasoning.modification_strategy)) {
+                        chemicalReasoningHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    chemicalReasoningHTML += '</ul></div>';
+                }
+                
+                chemicalReasoningHTML += '</div>';
+            }
+            
             stepDiv.innerHTML = `
                 <div class="step-header">
                     <div class="step-number">${step.step}</div>
@@ -642,6 +837,7 @@
                 </div>
                 <div class="step-description">${step.description}</div>
                 ${step.details ? `<div class="step-details">${step.details}</div>` : ''}
+                ${chemicalReasoningHTML}
             `;
             
             return stepDiv;
