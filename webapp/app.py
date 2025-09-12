@@ -140,6 +140,53 @@ def get_json_file_description(file_name):
     }
     return descriptions.get(file_name, '')
 
+def get_tools_used():
+    """Get information about tools and technologies used in the optimization process."""
+    return {
+        'cheminformatics': {
+            'name': 'RDKit',
+            'version': '2023.03.1',
+            'description': 'Molecular descriptors, QED, BRICS fragmentation',
+            'icon': '🧪',
+            'features': ['Molecular parsing', 'Property calculation', 'Fragment generation', 'Structure validation']
+        },
+        'machine_learning': {
+            'name': 'Scikit-Learn',
+            'version': '1.3.0',
+            'description': 'Random Forest for odor prediction',
+            'icon': '🤖',
+            'features': ['Random Forest Regressor', 'Standard Scaler', 'Property prediction', 'Molecular ML']
+        },
+        'ai_reasoning': {
+            'name': 'OpenAI GPT-5',
+            'version': 'gpt-5',
+            'description': 'LLM-based molecular design and reasoning',
+            'icon': '🧠',
+            'features': ['Chemical reasoning', 'Molecular generation', 'Strategic planning', 'Property optimization']
+        },
+        'visualization': {
+            'name': 'Matplotlib',
+            'version': '3.7.1',
+            'description': 'Scientific plotting and analysis',
+            'icon': '📊',
+            'features': ['Learning curves', 'Property distributions', 'Scaffold analysis', 'Statistical plots']
+        },
+        'algorithms': {
+            'name': 'BRICS Algorithm',
+            'version': 'RDKit',
+            'description': 'Fragment-based molecular generation',
+            'icon': '🔬',
+            'features': ['Molecular fragmentation', 'Fragment recombination', 'Chemical space exploration', 'Scaffold hopping']
+        },
+        'molecular_physics': {
+            'name': 'MMFF94',
+            'version': 'RDKit',
+            'description': 'Force field for energy calculations',
+            'icon': '⚛️',
+            'features': ['Molecular mechanics', 'Energy minimization', 'Conformer generation', 'Strain penalties']
+        }
+    }
+
 def generate_comprehensive_results(molecules_data, config, input_data):
     """Generate comprehensive results with before/after comparison and analysis."""
     if not molecules_data:
@@ -185,11 +232,15 @@ def generate_comprehensive_results(molecules_data, config, input_data):
     # Generate professional plots and file info from runs directory
     plots_data, files_data = generate_molecular_plots_and_files()
     
+    # Get tools and technologies used
+    tools_data = get_tools_used()
+    
     return {
         'comparison': comparison_data,
         'improvements': improvements,
         'plots': plots_data,  # Multiple professional plots
         'files': files_data,  # JSON files information
+        'tools': tools_data,  # Tools and technologies used
         'objective': config.get('objective', 'qed'),
         'total_candidates': len(molecules_data),
         'best_score': best_mol['score']
