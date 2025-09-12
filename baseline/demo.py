@@ -34,7 +34,7 @@ def ensure_dir(p: str) -> None:
 
 def main():
     ap = argparse.ArgumentParser(description="One-command demo runner with agentic controller")
-    ap.add_argument("--preset", default="qed_sa", choices=["qed_sa", "penlogp"], help="Which preset to run")
+    ap.add_argument("--preset", default="qed_sa", choices=["qed_sa", "penlogp", "odor"], help="Which preset to run")
     ap.add_argument("--out_dir", default="runs", help="Base directory for outputs")
     ap.add_argument("--rounds", type=int, default=6)
     ap.add_argument("--seeds", default="", help="Comma-separated seed SMILES to override preset")
@@ -73,6 +73,38 @@ def main():
             use_llm_candidates=args.llm_candidates,
             model=args.model,
             use_physchem=args.physchem,
+            train_on_composite=True,
+        )
+    elif args.preset == "odor":
+        # Chemosensory/odorant optimization preset
+        # Based on typical odorant properties: MW 90-250, logP 1-4, TPSA < 40
+        seeds = [
+            "COc1ccccc1",      # anisole (sweet, floral)
+            "CCOC(=O)C",       # ethyl acetate (fruity, sweet)
+            "O=C1OCCC1",       # γ-butyrolactone (caramel, burnt)
+            "CC1=CCC(CC1)O",   # terpineol (lilac, citrus)
+            "CCC(=O)C",        # butanone (fruity, acetone-like)
+            "O=CCCCCC",        # hexanal (green, grassy)
+            "CC1=CC=C(C=C1)C(C)C",  # p-cymene (citrus, woody)
+        ]
+        cfg = OptConfig(
+            objective="qed",  # Will be replaced with odor oracle later
+            rounds=args.rounds,
+            init_train_size=96,
+            candidates_per_round=80,
+            topk_per_round=60,
+            k_exploration=1.0,
+            lambda_strain=0.1,  # Lower strain penalty for flexible odorants
+            mmff_prescreen_factor=3.0,
+            diversity_penalty=0.4,  # Higher diversity for odor space exploration
+            sa_soft_beta=0.05,  # Light SA penalty
+            scaffold_penalty_alpha=0.2,  # Encourage scaffold diversity
+            log_csv=os.path.join(run_dir, "selections.csv"),
+            use_controller=True,
+            use_llm_controller=args.llm,
+            use_llm_candidates=args.llm_candidates,
+            model=args.model,
+            use_physchem=True,  # Important for volatility/odor properties
             train_on_composite=True,
         )
     else:  # penlogp
