@@ -75,6 +75,191 @@ from odor_oracle import OdorOracle
 import warnings
 warnings.filterwarnings("ignore")
 
+def generate_realistic_candidates_with_reasoning(objective):
+    """Generate realistic candidates with detailed LLM reasoning simulation."""
+    
+    if objective == 'qed':
+        return [
+            {
+                'smiles': 'COc1ccc(N)cc1',
+                'reason': 'Added amino group for hydrogen bonding',
+                'score': 0.78,
+                'llm_reasoning': 'Amino substitution increases HBD count and improves drug-likeness by enhancing hydrogen bonding potential',
+                'modification_type': 'Functional group addition',
+                'chemical_analysis': {
+                    'property_change': 'HBD: 0→1, TPSA: 20.2→26.0',
+                    'rationale': 'Amino groups are excellent for drug-target interactions'
+                }
+            },
+            {
+                'smiles': 'CC(=O)Nc1ccccc1',
+                'reason': 'Acetamide for improved drug-likeness',
+                'score': 0.82,
+                'llm_reasoning': 'Amide functionality provides both HBD and HBA, improving ADMET properties while maintaining aromaticity',
+                'modification_type': 'Scaffold modification',
+                'chemical_analysis': {
+                    'property_change': 'HBD: 0→1, HBA: 0→1, LogP: 2.1→1.4',
+                    'rationale': 'Amides are metabolically stable and improve solubility'
+                }
+            },
+            {
+                'smiles': 'c1ccc2nc(N)ccc2c1',
+                'reason': 'Quinoline with amino substituent',
+                'score': 0.75,
+                'llm_reasoning': 'Heterocyclic nitrogen provides bioactivity while amino group enhances drug-likeness',
+                'modification_type': 'Heterocycle formation',
+                'chemical_analysis': {
+                    'property_change': 'HBD: 0→1, HBA: 1→2, MW: 128→144',
+                    'rationale': 'Quinoline scaffold is common in drug discovery'
+                }
+            },
+            {
+                'smiles': 'COc1ccc(C(=O)N)cc1',
+                'reason': 'Amide substitution for QED optimization',
+                'score': 0.85,
+                'llm_reasoning': 'Combines aromatic methoxy with amide functionality for optimal drug-likeness balance',
+                'modification_type': 'Multi-functional modification',
+                'chemical_analysis': {
+                    'property_change': 'HBD: 0→1, HBA: 1→2, LogP: 2.1→1.2',
+                    'rationale': 'Balanced lipophilicity and polarity for membrane permeability'
+                }
+            }
+        ]
+    elif objective == 'odor':
+        return [
+            {
+                'smiles': 'COc1ccc(C=O)cc1',
+                'reason': 'Anisaldehyde for sweet floral scent',
+                'score': 0.89,
+                'llm_reasoning': 'Aldehyde functionality provides high volatility while methoxy group contributes sweet floral character',
+                'modification_type': 'Aldehyde introduction',
+                'chemical_analysis': {
+                    'volatility': 'High (top note)',
+                    'descriptors': 'floral, sweet, aldehydic',
+                    'rationale': 'Aldehydes are key top notes in perfumery'
+                }
+            },
+            {
+                'smiles': 'CC(=O)OCC(C)C',
+                'reason': 'Branched ester for fruity note',
+                'score': 0.85,
+                'llm_reasoning': 'Branched alkyl chain increases volatility while ester provides fruity character',
+                'modification_type': 'Ester formation',
+                'chemical_analysis': {
+                    'volatility': 'High (top note)',
+                    'descriptors': 'fruity, sweet, ester',
+                    'rationale': 'Branched esters are common in fruity fragrances'
+                }
+            },
+            {
+                'smiles': 'CC1=CC(=O)CCC1',
+                'reason': 'Cyclic ketone for woody base',
+                'score': 0.80,
+                'llm_reasoning': 'Cyclic structure provides stability while ketone offers woody, musky character',
+                'modification_type': 'Cyclic ketone formation',
+                'chemical_analysis': {
+                    'volatility': 'Low (base note)',
+                    'descriptors': 'woody, musky, ketonic',
+                    'rationale': 'Cyclic ketones provide long-lasting base notes'
+                }
+            },
+            {
+                'smiles': 'COc1ccc(OC)cc1',
+                'reason': 'Dimethoxy aromatic for volatility',
+                'score': 0.87,
+                'llm_reasoning': 'Dual methoxy groups increase volatility while maintaining aromatic character',
+                'modification_type': 'Multiple substitution',
+                'chemical_analysis': {
+                    'volatility': 'Medium (heart note)',
+                    'descriptors': 'aromatic, sweet, ethereal',
+                    'rationale': 'Multiple ether groups enhance volatility'
+                }
+            }
+        ]
+    elif objective == 'logp':
+        return [
+            {
+                'smiles': 'COc1ccc(Cl)cc1',
+                'reason': 'Chlorinated aromatic for lipophilicity',
+                'score': 2.8,
+                'llm_reasoning': 'Chlorine substitution significantly increases LogP while maintaining aromatic stability',
+                'modification_type': 'Halogen substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→2.8, MW: 108→142.5',
+                    'rationale': 'Halogens are highly lipophilic substituents'
+                }
+            },
+            {
+                'smiles': 'CCc1ccccc1',
+                'reason': 'Alkyl substitution for LogP optimization',
+                'score': 2.1,
+                'llm_reasoning': 'Ethyl group increases lipophilicity while maintaining drug-like properties',
+                'modification_type': 'Alkyl substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→2.1, MW: 78→106',
+                    'rationale': 'Alkyl groups are classic lipophilicity enhancers'
+                }
+            },
+            {
+                'smiles': 'COc1ccc(C)cc1',
+                'reason': 'Methyl substitution for balanced properties',
+                'score': 1.9,
+                'llm_reasoning': 'Methyl group provides moderate lipophilicity increase without excessive bulk',
+                'modification_type': 'Methyl substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→1.9, MW: 108→122',
+                    'rationale': 'Methyl groups provide balanced lipophilicity'
+                }
+            },
+            {
+                'smiles': 'CC(C)c1ccccc1',
+                'reason': 'Branched alkyl for higher LogP',
+                'score': 3.2,
+                'llm_reasoning': 'Branched isopropyl group maximizes lipophilicity through increased surface area',
+                'modification_type': 'Branched alkyl substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→3.2, MW: 78→120',
+                    'rationale': 'Branched alkyls are highly lipophilic'
+                }
+            }
+        ]
+    else:  # pen_logp
+        return [
+            {
+                'smiles': 'COc1ccc(Cl)cc1',
+                'reason': 'Chlorinated aromatic for lipophilicity',
+                'score': 0.72,
+                'llm_reasoning': 'Chlorine increases LogP but ring penalty reduces overall score',
+                'modification_type': 'Halogen substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→2.8, Ring penalty: 0→0',
+                    'rationale': 'Penalized LogP balances lipophilicity with drug-likeness'
+                }
+            },
+            {
+                'smiles': 'CCc1ccccc1',
+                'reason': 'Alkyl substitution for LogP optimization',
+                'score': 0.68,
+                'llm_reasoning': 'Ethyl group increases LogP with minimal ring penalty',
+                'modification_type': 'Alkyl substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→2.1, Ring penalty: 0→0',
+                    'rationale': 'Simple alkyl substitution avoids ring penalties'
+                }
+            },
+            {
+                'smiles': 'COc1ccc(C)cc1',
+                'reason': 'Methyl substitution for balanced properties',
+                'score': 0.75,
+                'llm_reasoning': 'Methyl group provides moderate LogP increase without ring penalty',
+                'modification_type': 'Methyl substitution',
+                'chemical_analysis': {
+                    'property_change': 'LogP: 2.1→1.9, Ring penalty: 0→0',
+                    'rationale': 'Methyl substitution maintains drug-likeness'
+                }
+            }
+        ]
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'scale_molecular_design_2024'
 
@@ -403,42 +588,38 @@ def run_molecular_optimization_demo(config, use_ai):
         'time': datetime.now().strftime('%H:%M:%S')
     })
     
-    # Simulate realistic candidate generation with progress updates
-    if config['objective'] == 'qed':
-        candidates = [
-            ("COc1ccc(N)cc1", "Added amino group for hydrogen bonding", 0.78),
-            ("CC(=O)Nc1ccccc1", "Acetamide for improved drug-likeness", 0.82),
-            ("c1ccc2nc(N)ccc2c1", "Quinoline with amino substituent", 0.75),
-            ("COc1ccc(C(=O)N)cc1", "Amide substitution for QED optimization", 0.85)
-        ]
-    elif config['objective'] == 'odor':
-        candidates = [
-            ("COc1ccc(C=O)cc1", "Anisaldehyde for sweet floral scent", 0.89),
-            ("CC(=O)OCC(C)C", "Branched ester for fruity note", 0.85),
-            ("CC1=CC(=O)CCC1", "Cyclic ketone for woody base", 0.80),
-            ("COc1ccc(OC)cc1", "Dimethoxy aromatic for volatility", 0.87)
-        ]
-    elif config['objective'] == 'logp':
-        candidates = [
-            ("COc1ccc(Cl)cc1", "Chlorinated aromatic for lipophilicity", 2.8),
-            ("CCc1ccccc1", "Alkyl substitution for LogP optimization", 2.1),
-            ("COc1ccc(C)cc1", "Methyl substitution for balanced properties", 1.9),
-            ("CC(C)c1ccccc1", "Branched alkyl for higher LogP", 3.2)
-        ]
-    else:  # pen_logp
-        candidates = [
-            ("COc1ccc(Cl)cc1", "Chlorinated aromatic for lipophilicity", 0.72),
-            ("CCc1ccccc1", "Alkyl substitution for LogP optimization", 0.68),
-            ("COc1ccc(C)cc1", "Methyl substitution for balanced properties", 0.75)
-        ]
+    # Generate realistic candidates with LLM reasoning simulation
+    candidates = generate_realistic_candidates_with_reasoning(config['objective'])
     
     # Generate candidates with realistic timing and progress
-    for i, (smiles, reason, score) in enumerate(candidates):
+    for i, candidate in enumerate(candidates):
+        # Add candidate to the list
         demo_state['molecules_generated'].append({
-            'smiles': smiles,
-            'description': reason,
-            'score': score
+            'smiles': candidate['smiles'],
+            'description': candidate['reason'],
+            'score': candidate['score'],
+            'llm_reasoning': candidate.get('llm_reasoning', ''),
+            'modification_type': candidate.get('modification_type', ''),
+            'chemical_analysis': candidate.get('chemical_analysis', {})
         })
+        
+        # Add reasoning step for each candidate exploration
+        demo_state['ai_reasoning'].append({
+            'step': f"4.{i+1}",
+            'title': f'Exploring Candidate {i+1}',
+            'description': f'Testing {candidate["smiles"]}',
+            'details': candidate['reason'],
+            'time': datetime.now().strftime('%H:%M:%S'),
+            'chemical_reasoning': {
+                'candidate_analysis': {
+                    'smiles': candidate['smiles'],
+                    'llm_reasoning': candidate.get('llm_reasoning', ''),
+                    'modification_type': candidate.get('modification_type', ''),
+                    'property_changes': candidate.get('chemical_analysis', {})
+                }
+            }
+        })
+        
         # Update progress incrementally
         demo_state['progress'] = 70 + (i + 1) * 6
         # Show each candidate being explored

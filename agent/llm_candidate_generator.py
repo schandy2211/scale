@@ -117,6 +117,194 @@ class LLMCandidateGenerator:
                             break
         
         return candidates[:n_candidates]
+
+    def generate_candidates_with_reasoning(
+        self, 
+        seed_mols: List[Chem.Mol], 
+        n_candidates: int,
+        objective: str,
+        current_best: float,
+        round_info: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Generate candidates with LLM reasoning."""
+        print(f"🧪 Generating {n_candidates} candidates with reasoning for {objective} objective...")
+        
+        # Try LLM generation first
+        llm_candidates = self._generate_llm_candidates_with_reasoning(seed_mols, n_candidates, objective, current_best, round_info)
+        
+        if len(llm_candidates) >= n_candidates // 2:  # If we got at least half from LLM
+            return llm_candidates[:n_candidates]
+        
+        # Fallback to BRICS with synthetic reasoning
+        brics_candidates = self._generate_brics_candidates_with_reasoning(seed_mols, n_candidates - len(llm_candidates))
+        
+        return llm_candidates + brics_candidates[:n_candidates - len(llm_candidates)]
+    
+    def _generate_llm_candidates_with_reasoning(
+        self, 
+        seed_mols: List[Chem.Mol], 
+        n_candidates: int,
+        objective: str,
+        current_best: float,
+        round_info: Optional[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """Generate candidates using LLM reasoning."""
+        
+        # Prepare context about current molecules
+        seed_smiles = [Chem.MolToSmiles(mol, canonical=True) for mol in seed_mols[:5]]  # Limit to first 5
+        seed_properties = []
+        
+        for mol in seed_mols[:3]:  # Analyze first 3 in detail
+            try:
+                qed = QED.qed(mol)
+                mw = Descriptors.MolWt(mol)
+                logp = Descriptors.MolLogP(mol)
+                hbd = Descriptors.NumHDonors(mol)
+                hba = Descriptors.NumHAcceptors(mol)
+                tpsa = Descriptors.TPSA(mol)
+                
+                seed_properties.append({
+                    "smiles": Chem.MolToSmiles(mol, canonical=True),
+                    "qed": round(qed, 3),
+                    "mw": round(mw, 1),
+                    "logp": round(logp, 2),
+                    "hbd": hbd,
+                    "hba": hba,
+                    "tpsa": round(tpsa, 1)
+                })
+            except Exception:
+                continue
+        
+        # Create prompt
+        prompt = self._create_generation_prompt_with_reasoning(seed_smiles, seed_properties, objective, current_best, round_info)
+        
+        try:
+            response = self.llm_client.generate_response(prompt)
+            if response and response.strip():
+                response_text = response.strip()
+                print(f"🧪 LLM Candidate Generator Raw Response: '{response_text[:200]}...' (showing first 200 chars)")
+            else:
+                print("⚠️ LLM returned None or empty response")
+            
+            return self._parse_llm_response_with_reasoning(response_text)
+            
+        except Exception as e:
+            print(f"❌ LLM API error in candidate generation: {e}")
+            print(f"🔍 Exception type: {type(e).__name__}")
+            return []
+    
+    def _generate_brics_candidates_with_reasoning(self, seed_mols: List[Chem.Mol], n_candidates: int) -> List[Dict[str, Any]]:
+        """Generate BRICS candidates with synthetic reasoning."""
+        candidates_with_reasoning = []
+        
+        try:
+            frags = set()
+            for m in seed_mols:
+                try:
+                    frags.update(BRICS.BRICSDecompose(m))
+                except Exception:
+                    continue
+            
+            if not frags:
+                return candidates_with_reasoning
+            
+            seen = set()
+            for _ in range(n_candidates * 3):  # Try more to account for failures
+                if len(candidates_with_reasoning) >= n_candidates:
+                    break
+                    
+                try:
+                    # Randomly select fragments
+                    frag1, frag2 = random.sample(list(frags), 2)
+                    combo = Chem.CombineMols(frag1, frag2)
+                    
+                    # Find dummy atoms and connect them
+                    dummies = [a.GetIdx() for a in combo.GetAtoms() if a.GetAtomicNum() == 0]
+                    if len(dummies) >= 2:
+                        em = Chem.EditableMol(combo)
+                        em.AddBond(dummies[0], dummies[1], order=Chem.rdchem.BondType.SINGLE)
+                        em.RemoveAtom(dummies[1])
+                        em.RemoveAtom(dummies[0])
+                        new_mol = em.GetMol()
+                        Chem.SanitizeMol(new_mol)
+                        
+                        smi = Chem.MolToSmiles(new_mol, canonical=True)
+                        if smi not in seen:
+                            seen.add(smi)
+                            candidates_with_reasoning.append({
+                                'molecule': new_mol,
+                                'smiles': smi,
+                                'reason': f"BRICS fragment combination: {Chem.MolToSmiles(frag1)} + {Chem.MolToSmiles(frag2)}",
+                                'descriptors': "fragment_combination",
+                                'volatility': ""
+                            })
+                except Exception:
+                    continue
+                    
+        except Exception as e:
+            print(f"BRICS generation failed: {e}")
+        
+        return candidates_with_reasoning
+    
+    def _create_generation_prompt_with_reasoning(self, seed_smiles: List[str], seed_properties: List[Dict], objective: str, current_best: float, round_info: Optional[Dict[str, Any]]) -> str:
+        """Create prompt for LLM candidate generation with reasoning."""
+        context = f"""You are an expert medicinal chemist and molecular designer. Generate {min(5, len(seed_smiles) * 2)} novel molecular candidates optimized for {objective.upper()} score.
+
+CURRENT MOLECULES:
+{chr(10).join([f"- {smiles}" for smiles in seed_smiles[:3]])}
+
+CURRENT PROPERTIES:
+{chr(10).join([f"- {prop['smiles']}: QED={prop['qed']}, MW={prop['mw']}, LogP={prop['logp']}, HBD={prop['hbd']}, HBA={prop['hba']}, TPSA={prop['tpsa']}" for prop in seed_properties])}
+
+CURRENT BEST {objective.upper()} SCORE: {current_best:.3f}
+
+OBJECTIVE: {objective.upper()}
+- QED: Drug-likeness (0-1, higher is better)
+- LogP: Lipophilicity (higher = more fat-soluble)
+- Odor: Odorant properties for fragrance applications
+
+GUIDELINES:
+- Generate novel molecules that improve upon current candidates
+- Use chemical reasoning for each modification
+- Ensure molecules are chemically valid and synthetically accessible
+- Focus on functional group modifications that enhance the target property
+
+RESPONSE FORMAT:"""
+        
+        if objective == "odor":
+            context += """
+{
+  "candidates": [
+    {
+      "smiles": "COc1ccccc1",
+      "reason": "Anisole derivative with sweet floral character, ideal volatility",
+      "descriptors": "floral, sweet",
+      "volatility": "middle"
+    },
+    {
+      "smiles": "CCOC(=O)C",
+      "reason": "Ethyl acetate for fruity top note, high volatility",
+      "descriptors": "fruity, sweet",
+      "volatility": "top"
+    }
+  ]
+}"""
+        else:
+            context += """
+{
+  "candidates": [
+    {
+      "smiles": "CCO",
+      "reason": "Added hydroxyl group to increase polarity and drug-likeness"
+    },
+    {
+      "smiles": "CC(=O)N",
+      "reason": "Introduced amide group for better ADMET properties"
+    }
+  ]
+}"""
+        
+        return context
     
     def _generate_llm_candidates(
         self, 
@@ -324,6 +512,59 @@ RESPONSE FORMAT:"""
             print(f"Response was: {response_text[:200]}...")
         
         return molecules
+
+    def _parse_llm_response_with_reasoning(self, response_text: str) -> List[Dict[str, Any]]:
+        """Parse LLM response and return molecules with their reasoning."""
+        candidates_with_reasoning = []
+        print(f"🔬 Parsing candidate generator response with reasoning...")
+        
+        try:
+            # Try to extract JSON from response
+            if "```json" in response_text:
+                json_start = response_text.find("```json") + 7
+                json_end = response_text.find("```", json_start)
+                json_text = response_text[json_start:json_end].strip()
+                print(f"📄 Extracted JSON from code block")
+            elif "{" in response_text and "}" in response_text:
+                json_start = response_text.find("{")
+                json_end = response_text.rfind("}") + 1
+                json_text = response_text[json_start:json_end]
+                print(f"📄 Extracted JSON from braces")
+            else:
+                # Try to parse the entire response as JSON
+                json_text = response_text
+                print(f"📄 Using entire response as JSON")
+            
+            data = json.loads(json_text)
+            print(f"✅ Successfully parsed candidate JSON with {len(data.get('candidates', []))} candidates")
+            candidates = data.get("candidates", [])
+            
+            for candidate in candidates:
+                smiles = candidate.get("smiles", "")
+                reason = candidate.get("reason", "No reasoning provided")
+                descriptors = candidate.get("descriptors", "")
+                volatility = candidate.get("volatility", "")
+                
+                if smiles:
+                    mol = Chem.MolFromSmiles(smiles)
+                    if mol is not None:
+                        try:
+                            Chem.SanitizeMol(mol)
+                            candidates_with_reasoning.append({
+                                'molecule': mol,
+                                'smiles': smiles,
+                                'reason': reason,
+                                'descriptors': descriptors,
+                                'volatility': volatility
+                            })
+                        except Exception:
+                            continue
+                            
+        except Exception as e:
+            print(f"Failed to parse LLM response: {e}")
+            print(f"Response was: {response_text[:200]}...")
+        
+        return candidates_with_reasoning
     
     def _generate_brics_candidates(self, seed_mols: List[Chem.Mol], n_candidates: int) -> List[Chem.Mol]:
         """Fallback BRICS candidate generation."""

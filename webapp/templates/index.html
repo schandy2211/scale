@@ -493,6 +493,89 @@
             font-weight: 600;
         }
 
+        /* LLM Reasoning Display */
+        .llm-reasoning {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--border-radius);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .reasoning-header {
+            font-weight: 600;
+            color: #3b82f6;
+            font-size: 12px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .reasoning-text {
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .modification-type {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-style: italic;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .chemical-analysis {
+            margin-top: var(--spacing-xs);
+            padding-top: var(--spacing-xs);
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .property-change, .volatility, .descriptors {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .rationale {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            font-style: italic;
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Candidate Analysis in Reasoning Steps */
+        .candidate-analysis {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+
+        .candidate-smiles {
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--color-accent);
+            font-weight: 600;
+            margin: var(--spacing-xs) 0;
+        }
+
+        .candidate-reasoning {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            line-height: 1.4;
+            margin: var(--spacing-xs) 0;
+        }
+
+        .property-changes {
+            margin-top: var(--spacing-xs);
+        }
+
+        .property-changes div {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
         /* Blend Formula */
         .blend-container {
             margin-top: var(--spacing-lg);
@@ -823,6 +906,27 @@
                     chemicalReasoningHTML += '</ul></div>';
                 }
                 
+                if (step.chemical_reasoning.candidate_analysis) {
+                    const candidate = step.chemical_reasoning.candidate_analysis;
+                    chemicalReasoningHTML += '<div class="reasoning-section candidate-analysis">';
+                    chemicalReasoningHTML += '<strong>🧬 Candidate Analysis:</strong>';
+                    chemicalReasoningHTML += `<div class="candidate-smiles">${candidate.smiles}</div>`;
+                    if (candidate.llm_reasoning) {
+                        chemicalReasoningHTML += `<div class="candidate-reasoning">${candidate.llm_reasoning}</div>`;
+                    }
+                    if (candidate.modification_type) {
+                        chemicalReasoningHTML += `<div class="modification-type">Type: ${candidate.modification_type}</div>`;
+                    }
+                    if (candidate.property_changes) {
+                        chemicalReasoningHTML += '<div class="property-changes">';
+                        for (const [key, value] of Object.entries(candidate.property_changes)) {
+                            chemicalReasoningHTML += `<div><strong>${key}:</strong> ${value}</div>`;
+                        }
+                        chemicalReasoningHTML += '</div>';
+                    }
+                    chemicalReasoningHTML += '</div>';
+                }
+                
                 chemicalReasoningHTML += '</div>';
             }
             
@@ -890,6 +994,21 @@
                                     <div class="molecule-smiles">${mol.smiles}</div>
                                     <div class="molecule-description">${mol.description}</div>
                                     <div class="molecule-score">Score: ${mol.score}</div>
+                                    ${mol.llm_reasoning ? `
+                                        <div class="llm-reasoning">
+                                            <div class="reasoning-header">🤖 AI Reasoning:</div>
+                                            <div class="reasoning-text">${mol.llm_reasoning}</div>
+                                            ${mol.modification_type ? `<div class="modification-type">Type: ${mol.modification_type}</div>` : ''}
+                                            ${mol.chemical_analysis ? `
+                                                <div class="chemical-analysis">
+                                                    ${mol.chemical_analysis.property_change ? `<div class="property-change">${mol.chemical_analysis.property_change}</div>` : ''}
+                                                    ${mol.chemical_analysis.volatility ? `<div class="volatility">Volatility: ${mol.chemical_analysis.volatility}</div>` : ''}
+                                                    ${mol.chemical_analysis.descriptors ? `<div class="descriptors">Descriptors: ${mol.chemical_analysis.descriptors}</div>` : ''}
+                                                    ${mol.chemical_analysis.rationale ? `<div class="rationale">${mol.chemical_analysis.rationale}</div>` : ''}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    ` : ''}
                                 </div>
                             `).join('')}
                         </div>
