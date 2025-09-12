@@ -42,6 +42,7 @@ def main():
     ap.add_argument("--physchem", action="store_true", help="Enable physchem descriptors in surrogate features")
     ap.add_argument("--llm", action="store_true", help="Use LLM-based controller (requires OPENAI_API_KEY)")
     ap.add_argument("--llm-candidates", action="store_true", help="Use LLM-based candidate generation (requires OPENAI_API_KEY)")
+    ap.add_argument("--model", default="gpt-4.1", help="LLM model to use (default: gpt-4.1)")
     args = ap.parse_args()
 
     print("SCALE — Scaffold-Conscious Agent for Learning & Exploration")
@@ -58,7 +59,7 @@ def main():
             objective="qed",
             rounds=args.rounds,
             init_train_size=128,
-            candidates_per_round=1200,
+            candidates_per_round=100,
             topk_per_round=80,
             k_exploration=1.2,
             lambda_strain=0.1,
@@ -70,6 +71,7 @@ def main():
             use_controller=True,
             use_llm_controller=args.llm,
             use_llm_candidates=args.llm_candidates,
+            model=args.model,
             use_physchem=args.physchem,
             train_on_composite=True,
         )
@@ -79,7 +81,7 @@ def main():
             objective="pen_logp",
             rounds=args.rounds,
             init_train_size=128,
-            candidates_per_round=1200,
+            candidates_per_round=100,
             topk_per_round=80,
             k_exploration=1.0,
             lambda_strain=0.2,
@@ -91,6 +93,7 @@ def main():
             use_controller=True,
             use_llm_controller=args.llm,
             use_llm_candidates=args.llm_candidates,
+            model=args.model,
             use_physchem=args.physchem,
             train_on_composite=False,
         )

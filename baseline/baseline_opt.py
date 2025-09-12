@@ -674,6 +674,7 @@ class OptConfig:
     use_controller: bool = False        # enable agentic controller
     use_llm_controller: bool = False    # use LLM-based controller instead of heuristic
     use_llm_candidates: bool = False    # use LLM-based candidate generation
+    model: str = "gpt-4.1"             # LLM model to use
     scaffold_cap_per_round: Optional[int] = None  # hard cap per Murcko scaffold among selected
     # Composite objective training (align model to realism):
     # if True, train RF on eff = QED - sa_soft_beta*SA - lambda_strain*strain
@@ -839,7 +840,7 @@ def run_optimization(
         if cfg.use_llm_controller:
             try:
                 print("🤖 Attempting to initialize LLM controller...")
-                controller = LLMController()
+                controller = LLMController(model=cfg.model)
                 print("✅ Using LLM-based controller")
             except Exception as e:
                 print(f"❌ Failed to initialize LLM controller: {e}. Falling back to heuristic controller.")
@@ -855,7 +856,7 @@ def run_optimization(
     llm_candidate_generator = None
     if cfg.use_llm_candidates:
         try:
-            llm_candidate_generator = LLMCandidateGenerator()
+            llm_candidate_generator = LLMCandidateGenerator(model=cfg.model)
             print("Using LLM-based candidate generation")
         except Exception as e:
             print(f"Failed to initialize LLM candidate generator: {e}. Using heuristic methods.")
@@ -1295,6 +1296,7 @@ if __name__ == "__main__":
     parser.add_argument("--agent", action="store_true", help="Enable agentic controller (heuristic)")
     parser.add_argument("--llm", action="store_true", help="Use LLM-based controller (requires OPENAI_API_KEY)")
     parser.add_argument("--llm-candidates", action="store_true", help="Use LLM-based candidate generation (requires OPENAI_API_KEY)")
+    parser.add_argument("--model", default="gpt-4.1", help="LLM model to use (default: gpt-4.1)")
     parser.add_argument("--history_json", default="", help="Path to save history JSON (best/avg/n_train)")
     parser.add_argument("--decisions_json", default="", help="Path to save per-round decisions JSON")
     parser.add_argument("--top_json", default="", help="Path to save final top list JSON")
@@ -1324,6 +1326,7 @@ if __name__ == "__main__":
         use_controller=args.agent or args.llm,
         use_llm_controller=args.llm,
         use_llm_candidates=args.llm_candidates,
+        model=args.model,
         scaffold_cap_per_round=(None if args.scaffold_cap is None or args.scaffold_cap < 0 else args.scaffold_cap),
         audit_k=args.audit_k,
         preserve_seed_scaffold=args.preserve_scaffold,
