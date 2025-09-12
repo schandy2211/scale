@@ -4,15 +4,40 @@ The AI Molecular Designer - From idea to molecule, fast. LLM reasoning + physics
 
 ## 🚀 Quick Start
 
+### **Option 1: Auto-Launcher (Recommended)**
 ```bash
 # From the main project directory
 python launch_demo.py
 ```
 
 The demo will automatically:
-1. Install Flask dependencies
-2. Start the web server at `http://127.0.0.1:5000`
-3. Open your browser to the demo
+1. ✅ Install Flask dependencies
+2. ✅ Start the web server at `http://localhost:8080`
+3. ✅ Open your browser to the demo
+
+### **Option 2: Manual Launch**
+```bash
+# Install Flask dependencies
+pip install Flask==2.3.3
+
+# Navigate to webapp directory
+cd webapp
+
+# Start the server
+python app.py
+```
+
+### **Access the Demo:**
+- **URL**: `http://localhost:8080`
+- **Features**: Interactive demos with real-time AI reasoning
+- **Stop Server**: Press `Ctrl+C` in terminal
+
+### **Troubleshooting:**
+- **Port 8080 in use**: The launcher automatically handles port conflicts
+- **Flask not found**: Run `pip install Flask==2.3.3` first
+- **Browser not opening**: Manually navigate to `http://localhost:8080`
+- **Demo not loading**: Check terminal for error messages and ensure all dependencies are installed
+- **Permission denied**: Make sure you're in the correct directory and have proper permissions
 
 ## 🎯 Demo Features
 

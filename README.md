@@ -34,13 +34,41 @@ pip install -r requirements.txt
 
 ### **🌐 Web Demo (Recommended)**
 **The agentic chemist in your browser. Explores, evaluates, and evolves with diversity and safety by design:**
+
+#### **Quick Launch:**
 ```bash
 python launch_demo.py
 ```
-Opens interactive web demo at `http://localhost:8080` with:
-- **💊 Drug Discovery**: Design molecules that make it to lab
-- **🧪 Fragrance Design**: Odorant optimization with volatility & safety  
-- **🎭 Mixture Optimization**: Turn intent into candidates that stick ⭐
+
+#### **Manual Launch:**
+```bash
+# Install Flask dependencies (if not already installed)
+pip install Flask==2.3.3
+
+# Start the web server
+cd webapp
+python app.py
+```
+
+#### **Access the Demo:**
+- **URL**: `http://localhost:8080`
+- **Features**: Interactive demos with real-time AI reasoning
+- **Demos Available**:
+  - **💊 Drug Discovery**: Design molecules that make it to lab
+  - **🧪 Fragrance Design**: Odorant optimization with volatility & safety  
+  - **🎭 Mixture Optimization**: Turn intent into candidates that stick ⭐
+
+#### **Demo Features:**
+- **Real-time Progress**: Watch agent formulate hypotheses and run experiments
+- **Chemical Reasoning**: See agent's experimentation process step-by-step
+- **Visual Results**: Elegant molecule cards and blend formulas
+- **Interactive UI**: Click any demo to see AI in action
+
+#### **Troubleshooting:**
+- **Port 8080 in use**: The launcher automatically handles port conflicts
+- **Flask not found**: Run `pip install Flask==2.3.3` first
+- **Browser not opening**: Manually navigate to `http://localhost:8080`
+- **Demo not loading**: Check terminal for error messages and ensure all dependencies are installed
 
 ### **⚡ Command Line**
 **For quick testing and development:**
