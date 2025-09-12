@@ -290,6 +290,17 @@ def _largest_ring_size(mol: Chem.Mol) -> int:
         return 0
 
 
+def objective_logp(mol: Chem.Mol) -> float:
+    """
+    Pure LogP (lipophilicity) optimization.
+    Higher LogP = more lipophilic (fat-soluble).
+    """
+    try:
+        return float(Descriptors.MolLogP(mol))
+    except Exception:
+        return 0.0
+
+
 def objective_penalized_logp_simple(mol: Chem.Mol) -> float:
     """
     A lightweight variant of penalized logP that avoids SA dependency:
@@ -708,6 +719,8 @@ def get_objective(name: str) -> ObjectiveFn:
     name = name.lower()
     if name in ("qed",):
         return objective_qed
+    elif name in ("logp", "lipophilicity"):
+        return objective_logp
     elif name in ("pen_logp", "penalized_logp", "pen-logp"):
         return objective_penalized_logp_simple
     elif name in ("odor", "odorant"):
@@ -1309,7 +1322,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Baseline BRICS + RF-UCB + MMFF optimizer")
     parser.add_argument("--seed", dest="seed", default="CC", help="Seed SMILES (comma-separated)")
-    parser.add_argument("--objective", dest="objective", default="qed", choices=["qed", "pen_logp"], help="Objective")
+    parser.add_argument("--objective", dest="objective", default="qed", choices=["qed", "logp", "pen_logp", "odor"], help="Objective")
     parser.add_argument("--rounds", type=int, default=6)
     parser.add_argument("--init", type=int, default=64, help="Initial training set size")
     parser.add_argument("--cands", type=int, default=600, help="Candidates per round")

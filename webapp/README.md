@@ -1,6 +1,6 @@
 # SCALE Web Demo
 
-The AI Molecular Designer - Idea to Molecule, fast! AI agentic experimentation and reasoning + physics + guardrails for synthesis‑ready candidates.
+The AI Molecular Designer - Idea to Molecule, fast! Agentic AI experimentation and reasoning + physics + guardrails for synthesis‑ready candidates.
 
 ## 🚀 Quick Start
 

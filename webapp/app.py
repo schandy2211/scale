@@ -39,13 +39,24 @@ def get_chemical_reasoning_for_objective(objective):
                 'safety_filters': 'No reactive groups, no PAINS patterns'
             }
         }
-    elif objective == 'pen_logp':
+    elif objective == 'logp':
         return {
             'objective_analysis': {
-                'pen_logp': 'Penalized LogP - Lipophilicity optimization'
+                'logp': 'LogP - Lipophilicity optimization'
             },
             'molecular_requirements': {
                 'lipophilicity': 'Optimizing membrane permeability and drug absorption',
+                'safety_filters': 'No reactive groups, no PAINS patterns'
+            }
+        }
+    elif objective == 'pen_logp':
+        return {
+            'objective_analysis': {
+                'pen_logp': 'Penalized LogP - Lipophilicity with ring penalty'
+            },
+            'molecular_requirements': {
+                'lipophilicity': 'Optimizing membrane permeability and drug absorption',
+                'ring_penalty': 'Penalizing large rings for drug-likeness',
                 'safety_filters': 'No reactive groups, no PAINS patterns'
             }
         }
@@ -406,6 +417,13 @@ def run_molecular_optimization_demo(config, use_ai):
             ("CC(=O)OCC(C)C", "Branched ester for fruity note", 0.85),
             ("CC1=CC(=O)CCC1", "Cyclic ketone for woody base", 0.80),
             ("COc1ccc(OC)cc1", "Dimethoxy aromatic for volatility", 0.87)
+        ]
+    elif config['objective'] == 'logp':
+        candidates = [
+            ("COc1ccc(Cl)cc1", "Chlorinated aromatic for lipophilicity", 2.8),
+            ("CCc1ccccc1", "Alkyl substitution for LogP optimization", 2.1),
+            ("COc1ccc(C)cc1", "Methyl substitution for balanced properties", 1.9),
+            ("CC(C)c1ccccc1", "Branched alkyl for higher LogP", 3.2)
         ]
     else:  # pen_logp
         candidates = [
