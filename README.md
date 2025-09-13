@@ -62,6 +62,7 @@ python app.py
 - **Real-time Progress**: Watch agent formulate hypotheses and run experiments
 - **Chemical Reasoning**: See agent's experimentation process step-by-step
 - **Visual Results**: Elegant molecule cards and blend formulas
+- **Tools Transparency**: See all computational tools being used (RDKit, GPT-5, MMFF94, etc.)
 - **Interactive UI**: Click any demo to see AI agent in action
 
 #### **Troubleshooting:**
