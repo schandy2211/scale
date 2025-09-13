@@ -273,7 +273,7 @@ This project is designed for hackathons and research. Key extension points:
 **SCALE makes molecule design simple:**
 
 1. **Pick your goal**: Drug discovery (`qed_sa`) or Fragrance (`odor`)
-2. **Add AI agent** (optional): `--llm --llm-candidates` 
+2. **Add AI agent**: `--llm --llm-candidates` 
 3. **Run**: Results automatically saved with plots
 
 **Quick Examples:**
