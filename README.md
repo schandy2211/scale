@@ -108,7 +108,7 @@ SCALE can optimize molecules for different purposes. Just pick your goal:
 ### **💊 Drug Discovery (QED Score)**
 **Goal**: Find drug-like molecules
 ```bash
-python baseline/demo.py --preset qed_sa --rounds 5
+python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 5
 ```
 - **QED Score**: 0-1 (higher = more drug-like)
 - **Examples**: Aspirin (0.65), Caffeine (0.78)
@@ -117,7 +117,7 @@ python baseline/demo.py --preset qed_sa --rounds 5
 ### **🧪 Fragrance & Flavor (Odor Score)**
 **Goal**: Find molecules that smell/taste good
 ```bash
-python baseline/demo.py --preset odor --rounds 5
+python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
 ```
 - **Odor Score**: 0-1 (higher = better odorant)
 - **Examples**: Anisole (floral), Ethyl acetate (fruity)
@@ -279,7 +279,7 @@ This project is designed for hackathons and research. Key extension points:
 **Quick Examples:**
 ```bash
 # Find drug molecules
-python baseline/demo.py --preset qed_sa --rounds 5
+python baseline/demo.py --preset qed_sa --llm --llm-candidates --rounds 5
 
 # Find fragrance molecules with AI agent help
 python baseline/demo.py --preset odor --llm --llm-candidates --rounds 5
